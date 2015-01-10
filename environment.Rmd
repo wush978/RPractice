@@ -1,0 +1,12 @@
+---
+title       : R 語言進階應用-環境設定
+subtitle    : 
+author      : Wush Wu
+job         : 
+framework   : io2012-wush
+highlighter : highlight.js
+hitheme     : zenburn
+widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+--- &vcenter .largecontent

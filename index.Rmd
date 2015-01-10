@@ -1,0 +1,119 @@
+---
+title       : R 語言進階應用-簡介
+subtitle    : 
+author      : Wush Wu
+job         : 
+framework   : io2012-wush
+highlighter : highlight.js
+hitheme     : zenburn
+widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+--- &vcenter .largecontent
+
+## 簡介
+
+<h1 class="big">R 可以用來做什麼？</h1>
+<br/>
+
+- 資料處理
+- 資料分析
+- 報表製作
+
+--- &vcenter .largecontent
+
+## 我們希望有些程式碼可以重新使用
+
+- Copy & Paste
+
+```r
+g1 <- lm(revenue ~ weekday + sales, data)
+summary(g1)$r.squared
+# ...
+g2 <- lm(revenue ~ weekday * sales, data)
+summary(g2)$r.squared
+```
+
+- 要改的時候非常麻煩
+
+--- &vcenter .largecontent
+
+## 我們希望有些程式碼可以重新使用
+
+- 和同仁交流
+
+```r
+library(RPostgreSQL)
+con <- dbConnect(dbDriver("PostgreSQL"), host = "192.168.0.50")
+data <- dbReadTable(con, "sales-2015-01-05")
+```
+
+- `RPostgreSQL`可能裝不起來
+- 資料庫換位置怎麼辦？換密碼怎麼辦？
+
+--- &vcenter .largecontent
+
+## 我們希望有些程式碼可以重新使用
+
+- 例行報表
+
+```r
+library(xtable)
+out <- xtable(summary(g1))
+```
+
+- 每天都要跑，能不能自動化？
+
+--- &vcenter .largecontent
+
+## Analysis as Packages
+
+- Duncan Murdoch 精彩地解釋為什麼要寫套件(Packages)和文章(Vignettes)：
+    <http://www.stats.uwo.ca/faculty/murdoch/ism2013/5Vignettes.pdf>
+- Robert M Flight 提供利用套件做分析的見解：
+    <http://rmflight.github.io/posts/2014/07/analyses_as_packages.html>
+
+--- &vcenter .largecontent
+
+## Duncan Murdoch：套件提供了以下功能
+
+- 完整的函數和資料
+- 伴隨著R 內的說明文件和R 外的文章
+- 和其他語言的整合（C 、C++ 、Java）
+- 正確性的檢查機制
+
+--- &vcenter .largecontent
+
+## Robert M Flight：套件不僅僅是為了別人，也是為了自己
+
+- 讓自己的程式碼更「完整」
+- 利用R 對文章撰寫的支援來製作報告
+
+--- &vcenter .largecontent
+
+## Wush Wu：讓分析流程自動化
+
+- 和其他工具更好地整合
+- 包裝成套件可以解決自動化之後的問題
+    - 自動測試
+    - 自動更新
+
+--- &vcenter .largecontent
+
+## 開發內部使用的R 套件很簡單
+
+<h1 class="big">感謝Hadley Wickham</h1>
+
+- Rstudio 完整的支援開發套件的種種功能
+    - 安裝
+    - 測試
+    - 文件
+    - 版本控制
+    - C++
+
+--- &vcenter .largecontent
+
+- [環境設定](environment.html)
+- [套件開發](development.html)
+- [自動測試與自動部署](ci.html)
+- [擴充應用](extension.html)
