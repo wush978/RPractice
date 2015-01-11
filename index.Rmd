@@ -68,10 +68,8 @@ out <- xtable(summary(g1))
 
 ## Analysis as Packages
 
-- Duncan Murdoch 精彩地解釋為什麼要寫套件(Packages)和文章(Vignettes)：
-    <http://www.stats.uwo.ca/faculty/murdoch/ism2013/5Vignettes.pdf>
-- Robert M Flight 提供利用套件做分析的見解：
-    <http://rmflight.github.io/posts/2014/07/analyses_as_packages.html>
+- [Duncan Murdoch 精彩地解釋為什麼要寫套件(Packages)和文章(Vignettes)](http://www.stats.uwo.ca/faculty/murdoch/ism2013/5Vignettes.pdf)
+- [Robert M Flight 提供利用套件做分析的見解](http://rmflight.github.io/posts/2014/07/analyses_as_packages.html)
 
 --- &vcenter .largecontent
 
@@ -84,7 +82,7 @@ out <- xtable(summary(g1))
 
 --- &vcenter .largecontent
 
-## Robert M Flight：套件不僅僅是為了別人，也是為了自己
+## Robert M Flight：為分析寫套件
 
 - 讓自己的程式碼更「完整」
 - 利用R 對文章撰寫的支援來製作報告

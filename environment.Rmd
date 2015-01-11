@@ -10,3 +10,210 @@ widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
 --- &vcenter .largecontent
+
+## 目標
+
+- 透過docker快速架設可用的Rstudio Server、http server、各種database
+- 撰寫各種套件雛形
+- 版本控制入門
+
+--- &vcenter .largecontent
+
+## 今日環境介紹
+
+- Virtual Box架設的虛擬機器
+- 架設細節均在目錄`materials/vagrant`之下
+    - Ubuntu 14.04 from [Vagrant](https://www.vagrantup.com/)
+    - Docker
+    - 虛擬機器的位置應位於`192.168.0.50`
+    - 請利用pietty或其他ssh agent連線到`192.168.0.50`，帳號密碼為`vagrant/vagrant`
+
+--- &vcenter .largecontent
+
+## 啟動Rstudio Server
+
+- 請在命令列輸入：
+
+<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 \
+  -v /home/vagrant/R-CI-repository/RContinuousIntegration:/home/vagrant/RContinuousIntegration \
+  rocker/rstudio
+</code></pre>
+
+- 打開Firefox，在網址輸入：`192.168.0.50:8787`
+    - 帳號為：`vagrant`
+    - 密碼為：`vagrant`
+
+--- &vcenter .largecontent
+
+## Rstudio 界面解說
+
+- 四塊工作區的功能解說
+
+--- &vcenter .largecontent
+
+## 建立新專案--建立新套件
+
+- 操作Rstudio Server建立新專案
+- 設定Build 選項，切換至套件開發模式
+
+## 動動手
+
+- 請建立一個新專案，名稱為：CRANLog
+    - 記得啟用git
+
+<h1 class="big">我們來建立一個抓取資料的套件</h1>
+
+--- &vcenter .largecontent
+
+## 目標簡介
+
+- 資料位置：<http://cran-logs.rstudio.com/>
+    - 一個放有<http://cran.rstudio.com/>的線上記錄
+- 我們想要抓取每天的套件下載量作分析
+- 講師已經預先把12月份的資料至於虛擬機器之中，請執行：
+
+<pre><code style="font-size:80%">docker run -d --name httpd \
+  -v /home/vagrant/www:/usr/local/apache2/htdocs -p 80:80 \
+  httpd:latest
+</code></pre>
+
+--- &vcenter .largecontent
+
+## 範例下載script
+
+（修改自<http://cran-logs.rstudio.com/>上的範例）
+
+```r
+# 開始日期
+start <- as.Date('2015-01-01')
+# 結束日期
+end <- as.Date('2015-01-02')
+# 展開所有日期
+all_days <- seq(start, end, by = 'day')
+# 扣掉已經下載的連結
+missing_days <- setdiff(all_days, tools::file_path_sans_ext(dir(), TRUE))
+class(missing_days) <- "Date"
+# 拼湊出下載連結
+year <- as.POSIXlt(all_days)$year + 1900
+urls <- paste0('http://192.168.0.50/cran-log/', year, '/', missing_days, '.csv.gz')
+# 可以使用download.file來做下載
+for(i in seq_along(urls)) {
+  download.file(urls[i], destfile = sprintf("%s.csv.gz", missing_days[i]))
+}
+```
+
+--- &vcenter .largecontent
+
+## 讀取資料
+
+續上一頁的程式
+
+```r
+data <- read.table("2015-01-01.csv.gz", header = TRUE, sep = ",")
+head(sort(table(data$package), decreasing = TRUE))
+```
+
+```
+##     digest        DBI       plyr manipulate       Rcpp    ggplot2 
+##      1009        973        896        877        867        817 
+```
+
+--- &vcenter .largecontent
+
+## 一個可能的實際情況...
+
+1. 資料來自於某個資料源: `download.file`
+1. 每天都要自該資料源更新資料: `missing_days <- ...`
+1. 使用既定程序分析出結果: `table`
+1. 輸出結果: `print`
+
+--- &vcenter .largecontent
+
+## 把1 ~ 4包成一個函數
+
+```r
+pkg_count <- function(date) {
+  year <- as.POSIXlt(date)$year + 1900
+  urls <- paste0('http://192.168.0.50/cran-log/', year, '/', date, '.csv.gz')
+  download.file(urls, destfile = sprintf("%s.csv.gz", date))
+  data <- read.table(sprintf("%s.csv.gz", date), header = TRUE, sep = ",")
+  sort(table(data$package), decreasing = TRUE)
+}
+```
+
+--- &vcenter .largecontent
+
+## 可能有什麼問題？
+
+- 缺少文件，不知道date是`Date`物件還是字串（過幾個月後，會忘記的）
+- `date`只接受單日
+    - 如果錯誤發生，需要追日期怎麼辦？
+
+--- &vcenter .largecontent
+
+## 當其他人需要分析結果...
+
+- 將`pkg_count`的程式碼丟給下游（Copy & Paste）
+- 將`pkg_count`存成`pkg_count.R`，丟給下游（`source`）
+- 將`pkg_count`包成套件，上傳到套件庫供下游下載
+
+--- &vcenter .largecontent
+
+## 將`pkg_count`新增至CRANLog
+
+- 請跟著講師操作
+
+*** =pnotes
+
+建立一個檔案，將上述的`pkg_count`貼上、將檔案儲存至資料夾R 之下、建立和安裝套件、重新啟動、載入`CRANLog`、輸入`pkg_count`
+
+--- &vcenter .largecontent
+
+## 建立`pkg_count`的說明文件
+
+- 請跟著講師操作
+
+--- &vcenter .largecontent
+
+## 將套件放置至私有套件庫
+
+- 請跟著講師操作
+
+--- &vcenter .largecontent
+
+## 嘗試從套件庫中安裝套件CRANLog
+
+- 請跟著講師操作
+
+--- &vcenter .largecontent
+
+## 統一編號查詢
+
+- 很多時候，我們會使用代碼來代表某些資料
+- 代碼的意義可能放在某些資料庫之中
+- 在製作報表的時候，<font color="red">常常</font>需要將代碼轉譯回人類可讀的文字
+    - 重複的程式碼
+    - 客製化
+
+--- &vcenter .largecontent
+
+## 啟動mongodb
+
+--- &vcenter .largecontent
+
+## 安裝套件`rmongodb`
+
+--- &vcenter .largecontent
+
+## 如何參與Open Source
+
+--- &vcenter .largecontent
+
+## 建立專案
+
+--- &vcenter .largecontent
+
+## 參考`rmongodb`
+
+--- &vcenter .largecontent
+
