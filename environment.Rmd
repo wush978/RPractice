@@ -1,5 +1,5 @@
 ---
-title       : R 語言進階應用-環境設定
+title       : R 軟體套件開發實務應用- 環境設定、語言介紹
 subtitle    : 
 author      : Wush Wu
 job         : 
@@ -14,8 +14,8 @@ knit        : slidify::knit2slides
 ## 目標
 
 - 透過docker快速架設可用的Rstudio Server、http server、各種database
-- 撰寫各種套件雛形
-- 版本控制入門
+- 解決數種實務上讀取資料的問題
+- 版本控制入門(git)
 
 --- &vcenter .largecontent
 
@@ -26,7 +26,7 @@ knit        : slidify::knit2slides
     - Ubuntu 14.04 from [Vagrant](https://www.vagrantup.com/)
     - Docker
     - 虛擬機器的位置應位於`192.168.0.50`
-    - 請利用pietty或其他ssh agent連線到`192.168.0.50`，帳號密碼為`vagrant/vagrant`
+    - 請利用虛擬機器的GUI ，或ssh agent連線到`192.168.0.50`，帳號密碼為`vagrant/vagrant`
 
 --- &vcenter .largecontent
 
@@ -35,19 +35,35 @@ knit        : slidify::knit2slides
 - 請在命令列輸入：
 
 <pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 \
-  -v /home/vagrant/R-CI-repository/RContinuousIntegration:/home/vagrant/RContinuousIntegration \
-  rocker/rstudio
+    rocker/rstudio
 </code></pre>
 
 - 打開Firefox，在網址輸入：`192.168.0.50:8787`
     - 帳號為：`vagrant`
     - 密碼為：`vagrant`
 
+*** =pnotes
+
+講解docker指令
+講解`-p`([TCP/UDP端口列表](http://zh.wikipedia.org/wiki/TCP/UDP%E7%AB%AF%E5%8F%A3%E5%88%97%E8%A1%A8))
+
 --- &vcenter .largecontent
 
 ## Rstudio 界面解說
 
 - 四塊工作區的功能解說
+- 命令列的功能解說與示範
+- 展示說明文件
+- 展示`example`和`demo`
+
+*** =pnotes
+
+```r
+demo(error.catching)
+demo(is.things)
+demo(recursion)
+demo(scoping)
+```
 
 --- &vcenter .largecontent
 
@@ -55,6 +71,12 @@ knit        : slidify::knit2slides
 
 - 操作Rstudio Server建立新專案
 - 設定Build 選項，切換至套件開發模式
+
+*** =pnotes
+
+解釋三種build選項
+
+--- &vcenter .largecontent
 
 ## 動動手
 
@@ -77,9 +99,13 @@ knit        : slidify::knit2slides
   httpd:latest
 </code></pre>
 
---- &vcenter .largecontent
+*** =pnotes
 
-## 範例下載script
+講解`-v`
+
+--- &vcenter .largecontent #download_script
+
+## 範例下載script =
 
 （修改自<http://cran-logs.rstudio.com/>上的範例）
 
@@ -102,11 +128,50 @@ for(i in seq_along(urls)) {
 }
 ```
 
+--- &twocol .largecontent
+
+## R是一個以函數為主體的語言
+
+*** =left
+
+### 看得到的
+
+- `as.Date`
+- `seq`
+- `setdiff`
+
+*** =right
+
+### 容易忽略的
+
+- `<-`
+- `(`
+- `for`
+
+*** =pnotes
+
+學習如何檢查特殊字元內容的函數
+
+--- &vcenter .largecontent
+
+## 追程式碼的技巧
+
+- 檢視函數物件
+- 檢視S3方法
+- 檢視套件中的隱藏物件（介紹`::`和`:::`）
+
+```r
+print
+methods(print)
+print.acf
+stats:::print.acf
+```
+
 --- &vcenter .largecontent
 
 ## 讀取資料
 
-續上一頁的程式
+續下載資料的程式
 
 ```r
 data <- read.table("2015-01-01.csv.gz", header = TRUE, sep = ",")
@@ -117,6 +182,13 @@ head(sort(table(data$package), decreasing = TRUE))
 ##     digest        DBI       plyr manipulate       Rcpp    ggplot2 
 ##      1009        973        896        877        867        817 
 ```
+
+*** =pnotes
+
+- `read.table`
+- `sort`
+- `table`
+- `$`
 
 --- &vcenter .largecontent
 
@@ -148,6 +220,10 @@ pkg_count <- function(date) {
 - 缺少文件，不知道date是`Date`物件還是字串（過幾個月後，會忘記的）
 - `date`只接受單日
     - 如果錯誤發生，需要追日期怎麼辦？
+    
+*** =pnotes
+
+`Date`物件介紹
 
 --- &vcenter .largecontent
 
@@ -179,6 +255,10 @@ pkg_count <- function(date) {
 
 - 請跟著講師操作
 
+*** =pnotes
+
+複習docker的`-v`
+
 --- &vcenter .largecontent
 
 ## 嘗試從套件庫中安裝套件CRANLog
@@ -198,6 +278,8 @@ pkg_count <- function(date) {
 --- &vcenter .largecontent
 
 ## 啟動mongodb
+
+
 
 --- &vcenter .largecontent
 

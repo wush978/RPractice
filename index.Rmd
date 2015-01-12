@@ -1,5 +1,5 @@
 ---
-title       : R 語言進階應用-簡介
+title       : R 軟體套件開發實務應用
 subtitle    : 
 author      : Wush Wu
 job         : 
@@ -9,16 +9,124 @@ hitheme     : zenburn
 widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
+--- &twocol
+
+```{r setup, include=FALSE, cache=FALSE}
+suppressPackageStartupMessages({
+  library(knitr)
+  library(wordcloud)
+  library(RColorBrewer)
+})
+opts_chunk$set(echo = FALSE, cache = FALSE)
+fit100 <- function(fname) sprintf('<img src="assets/img/%s" class="fit100" />', fname)
+fit50 <- function(fname) sprintf('<img src="assets/img/%s" class="fit50" />', fname)
+fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:%d%%;max-height:%d%%;" />', fname, size, size)
+```
+
+## 關於講者
+
+*** =left
+
+- 台灣大學電機工程學研究所博士生
+- Taiwan R User Group 共同創辦人
+- 資料科學愛好者年會 - 課程總召
+- R 套件相關著作
+    - [FeatureHashing](http://cran.r-project.org/web/packages/FeatureHashing/index.html)和[RMessenger](http://cran.r-project.org/web/packages/RMessenger/)的作者
+    - [knitr](http://cran.r-project.org/web/packages/knitr/) 的推廣者和小貢獻者
+    - [RcppCNPy](http://cran.r-project.org/web/packages/RcppCNPy/)的第二作者
+    - [digest](http://cran.r-project.org/web/packages/digest/)的貢獻者
+
+*** =right
+
+`r fig('wush.jpg', 100)`
+
+--- .segue .dark
+
+## 為什麼R 這麼受歡迎？
+
+--- &vcenter
+
+## R 來自世界上最專業的統計學家
+
+<center>`r fit100('statician_10521919-655x280.jpg')`</center>
+
+圖片來源： <http://myfootpath.com/careers/engineering-careers/statistician-careers/>
+
+---
+
+## R 可以輸出高品質的視覺化
+
+`r fig("flights_sml.jpg", 100)`
+
+取自<http://www.r-bloggers.com/mapping-the-worlds-biggest-airlines/>
+
+--- &vcenter
+
+## R 有驚人彈性和潛力
+
+<center>`r fig("fig_10_cran1.png", 75)`</center>
+
+取自 <http://r4stats.com/2013/03/19/r-2012-growth-exceeds-sas-all-time-total/>
+
+--- &vcenter
+
+## R 很容易和其他工具整合
+
+<center>
+```{r r-integration, warning=FALSE}
+tools <- strsplit("Rcpp,rJava,rpy2,RHadoop,RMySQL,RPostgreSQL,RJDBC,RODBC,ROpenOffice,rredis,rmongodb,RSelenium", ",")[[1]]
+freq <- rep(1, length(tools))
+pal <- brewer.pal(length(tools),"BuGn")
+wordcloud(tools, freq, random.color = TRUE, colors = pal)
+```
+</center>
+
+--- &vcenter
+
+## R 很容易擴充和客製化
+
+<center>`r fig("t134_3ca_lg.jpg", 100)`</center>
+來源：<http://img.diynetwork.com/DIY/2003/09/18/t134_3ca_med.jpg>
+
+--- .segue .dark
+
+## R 是 Open Source
+
 --- &vcenter .largecontent
 
-## 簡介
+## Open Source?
 
-<h1 class="big">R 可以用來做什麼？</h1>
-<br/>
+- 驚人的潛力和彈性
+- 容易擴充和客製化
+- 只要你願意且有能力，就可以貢獻並且改進
+
+--- &vcenter .largecontent
+
+## R 是一種泛用的軟體工具
+
+- 能做的事情，和所有其他工具(Python, PHP, Java, ...)一樣多
+- R 的底層是C ，可以簡單和以C 為基底的工具(Python, PHP, nodejs)串接
+    - [Call Python from R through Rcpp](http://gallery.rcpp.org/articles/rcpp-python/)
+- [rJava] 讓R 也可以和Java Based的工具串接
+    - RcppHDFS
+
+--- &vcenter .largecontent
+
+## R 在軟體工具中的定位
 
 - 資料處理
 - 資料分析
 - 報表製作
+
+--- &vcenter .largecontent
+
+## 軟體工程
+
+- 程式碼的寫作是有功力深厚之別
+    - 可以在自己的電腦上跑
+    - 可以在別人的電腦上跑
+    - 可以讀、可以改
+    - 穩健
 
 --- &vcenter .largecontent
 
@@ -35,6 +143,10 @@ summary(g2)$r.squared
 ```
 
 - 要改的時候非常麻煩
+
+*** =pnotes
+
+如果要把`lm`改成`glm`呢？
 
 --- &vcenter .largecontent
 
@@ -111,7 +223,27 @@ out <- xtable(summary(g1))
 
 --- &vcenter .largecontent
 
-- [環境設定](environment.html)
+## 本期課程目標（表定）
+
+- R語言軟體套件開發環境、語言介紹
+- 撰寫R語言軟體套件
+- 自動測試與佈署R語言軟體套件
+- R語言擴充應用
+
+--- &vcenter .largecontent
+
+## 我的目標
+
+- 帶給大家真正有用的技術
+    - 以最方便和最簡單的方式建立開發環境（[docker](https://www.docker.com/)）
+    - 最新和最少，也最重要的軟體工程相關工具介紹（[git](http://git-scm.com/) 、[github](https://github.com/)）
+    - 最新的製作套件相關的技術（R ）
+
+--- &vcenter .largecontent
+
+- [環境設定、語言介紹](environment.html)
 - [套件開發](development.html)
 - [自動測試與自動部署](ci.html)
 - [擴充應用](extension.html)
+
+---
