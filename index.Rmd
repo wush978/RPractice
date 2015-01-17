@@ -161,7 +161,7 @@ data <- dbReadTable(con, "sales-2015-01-05")
 ```
 
 - `RPostgreSQL`可能裝不起來
-- 資料庫換位置怎麼辦？換密碼怎麼辦？
+- 資料庫換位置怎麼辦？
 
 --- &vcenter .largecontent
 

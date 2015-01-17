@@ -39,6 +39,7 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
     - Docker
     - 虛擬機器的位置應位於`192.168.0.50`
     - 請利用虛擬機器的GUI ，或ssh agent連線到`192.168.0.50`，帳號密碼為`vagrant/vagrant`
+        - 講者也有準備web-based ssh client，請連線到`https://192.168.0.50:4200`
 
 --- &vcenter .largecontent
 
@@ -46,9 +47,7 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 - 請在命令列輸入：
 
-<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 \
-    rocker/rstudio
-</code></pre>
+<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rocker/rstudio</code></pre>
 
 - 打開Firefox，在網址輸入：`192.168.0.50:8787`
     - 帳號為：`vagrant`
@@ -71,28 +70,28 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 *** =pnotes
 
 ```r
-demo(error.catching)
 demo(is.things)
-demo(recursion)
+demo(error.catching)
 demo(scoping)
+demo(recursion)
 ```
 
 --- &vcenter .largecontent
 
-## 建立新專案--建立新套件
+## 建立新專案
 
 - 操作Rstudio Server建立新專案
 - 設定Build 選項，切換至套件開發模式
 
 *** =pnotes
 
-解釋三種build選項
+解釋各種專案、解釋Build 選項
 
 --- &vcenter .largecontent
 
 ## 動動手
 
-- 請建立一個新專案，名稱為：CRANLog
+- 請建立一個一般的新專案，名稱為：CRANLog
     - 記得啟用git
 
 <h1 class="big">我們來建立一個抓取資料的套件</h1>
@@ -227,18 +226,6 @@ pkg_count <- function(date) {
 
 --- &vcenter .largecontent
 
-## 可能有什麼問題？
-
-- 缺少文件，不知道date是`Date`物件還是字串（過幾個月後，會忘記的）
-- `date`只接受單日
-    - 如果錯誤發生，需要追日期怎麼辦？
-    
-*** =pnotes
-
-`Date`物件介紹
-
---- &vcenter .largecontent
-
 ## 當其他人需要分析結果...
 
 - 將`pkg_count`的程式碼丟給下游（Copy & Paste）
@@ -247,25 +234,139 @@ pkg_count <- function(date) {
 
 --- &vcenter .largecontent
 
-## 將`pkg_count`新增至CRANLog
+## 利用git 來傳送`pkg_count.R`
+
+- [git](http://git-scm.com/) 提供了許多強大功能
+    - 高效能的傳送檔案
+    - 版本控制
+- [github](https://github.com) 以git 為底的程式碼社交平台
+    - 優化程式相關的討論環境
+    - 已經和許多線上服務整合
+- [gitlab](https://about.gitlab.com/) 私有版本的github
+
+--- &vcenter .largecontent
+
+## 將`pkg_count`新增至CRANLog專案
+
+- 請跟著講師操作，把`pkg_count.R`加入git 的版本控制
+    - 會需要設定作者資訊
+    - 學習簡單使用rstudio shell
+
+--- &vcenter .largecontent
+
+## 將CRANLog專案上傳到github
+
+- 請跟著講師操作，註冊github帳號
+- 設定ssh 金鑰
+- 建立專案
+- 上傳CRANLog
+- 測試下載CRANLog
+
+--- &vcenter .largecontent
+
+## 了解ssh key
+
+- ssh實做了RSA 、DSA 和ECDSA 等非對稱加解密演算法
+    - 密碼是兩個檔案：`id_rsa`(private)和`id_rsa.pub`(public)
+    - 特色：用public加密的資料，只能用private解密。反之亦然。
+    - 廣泛的被運用於各種網頁應用之中，如https。
+    - github、AWS 等網站運用這種技術來做自動認證
+
+--- &vcenter .largecontent
+
+## 建立ssh key:`ssh-keygen`
+
+```
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/vagrant/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/vagrant/.ssh/id_rsa.
+Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub.
+The key fingerprint is:
+dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
+```
+
+--- &vcenter .largecontent
+
+## 上傳public key
+
+- 請跟著講師操作，上傳key 到github
+
+--- &vcenter .largecontent
+
+## 建立github專案
 
 - 請跟著講師操作
 
-*** =pnotes
+--- &vcenter .largecontent
 
-建立一個檔案，將上述的`pkg_count`貼上、將檔案儲存至資料夾R 之下、建立和安裝套件、重新啟動、載入`CRANLog`、輸入`pkg_count`
+## 設定遠端專案，上傳
+
+- 請跟著講師操作
+
+圖片出處：[git-tower](http://www.git-tower.com/learn/ebook/command-line/remote-repositories/introduction)
+
+<center>`r fit50("basic-remote-workflow.png")`</center>
+
+--- &vcenter .largecontent
+
+## 下載`pkg_count.R`
+
+- 把自己當成另一個使用者
+- 請跟著講師建立新專案CRANLog2
+    - 來自版本控制
+
+--- &vcenter .largecontent
+
+## 運用`git`和`github`的好處
+
+- 備份
+- 版本控制：
+    - 改爛了可以回溯
+    - 兩個人一起改就有衝突解決機制
+    - 被改爛了可以找到兇手
+- 良好的討論空間
+- 自動測試
+- 自動部署
+
+--- &vcenter .largecontent
+
+## 私人版的github
+
+- [gitlab](https://about.gitlab.com/)
 
 --- &vcenter .largecontent
 
 ## 建立`pkg_count`的說明文件
 
+- README.md
+
+```md
+這個程式是用來統計R 的套件在CRAN上的下載次數
+```
+
+--- .segue .dark
+
+## 套件化
+
+--- &vcenter .largecontent
+
+## 建立套件專案CRANLogPkg
+
 - 請跟著講師操作
+    - 建立專案
+    - 刪除部分檔案
+    - 建立檔案`pkg_count.R`
 
 --- &vcenter .largecontent
 
 ## 將套件放置至私有套件庫
 
 - 請跟著講師操作
+    - 打包套件
+    - 在終端機將套件複製到`~/www/R/src/contrib`
+    - 在該目錄下更新套件資訊（`PACKAGES`, `PACKAGES.gz`）（卡住）
 
 *** =pnotes
 
@@ -273,13 +374,44 @@ pkg_count <- function(date) {
 
 --- &vcenter .largecontent
 
-## 嘗試從套件庫中安裝套件CRANLog
+## 利用Docker更新套件資訊
 
-- 請跟著講師操作
+- shell
+
+```sh
+docker run -v `pwd`:/src -it --rm rocker/rstudio R
+```
+
+- R
+
+```r
+setwd("/src")
+tools::write_PACKAGES(".")
+```
+
+*** =pnotes
+
+工作目錄的概念
 
 --- &vcenter .largecontent
 
-## 統一編號查詢
+## 直接從套件庫安裝
+
+- 可能需要重新啟動R
+
+```r
+install.packages("CRANLogPkg", 
+  repos = "http://192.168.0.50/R",
+  type = "source")
+```
+
+*** =pnotes
+
+原理待日後再細解
+
+--- &vcenter .largecontent
+
+## 統一編號查詢(mongodb)
 
 - 很多時候，我們會使用代碼來代表某些資料
 - 代碼的意義可能放在某些資料庫之中
@@ -319,6 +451,25 @@ mongo.get.databases(mongo)
 
 --- &vcenter .largecontent
 
+## 建立套件VATQuery
+
+- 請模仿講者之前的示範，將統編轉換為公司名稱的功能
+    - 函數化
+    - 放入套件
+- 更新`DESCRIPTION`
+    - 加入`Depends: rmongodb`
+
+--- &vcenter .largecontent
+
+## R 套件和git
+
+- 加入：
+    - R/
+    - DESCRIPTION
+    - NAMESPACE
+
+--- &vcenter .largecontent
+
 ## 經驗分享：如何回報bug
 
 <https://github.com/mongosoup/rmongodb/issues/20>
@@ -332,7 +483,7 @@ mongo.get.databases(mongo)
 
 ## 政府標案資料
 
-- DSP
+- 資料來源：[DSP](http://dsp.im)
 
 --- &vcenter .largecontent
 
@@ -345,6 +496,10 @@ docker run -d --name r-postgres -p 5432:5432 r-postgres
 --- &vcenter .largecontent
 
 ## 安裝RPostgreSQL(需要安裝其他相依模組)
+
+- 解決方式：
+    - google
+    - 包好docker，Dockerfile裏面會詳細註明安裝過程
 
 --- &vcenter .largecontent
 
@@ -392,7 +547,7 @@ install.packages('RPostgreSQL', repos = 'http://192.168.0.50/R')
 library(RPostgreSQL)
 db <- dbConnect(dbDriver("PostgreSQL"), host = "192.168.0.50", 
                 user = "vagrant", password = "vagrant")
-
+dbListTable(db)
 ```
 
 --- &vcenter .largecontent
