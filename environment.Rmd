@@ -11,6 +11,18 @@ mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
 --- &vcenter .largecontent
 
+```{r setup, include=FALSE, cache=FALSE}
+suppressPackageStartupMessages({
+  library(knitr)
+  library(wordcloud)
+  library(RColorBrewer)
+})
+opts_chunk$set(echo = FALSE, cache = FALSE)
+fit100 <- function(fname) sprintf('<img src="assets/img/%s" class="fit100" />', fname)
+fit50 <- function(fname) sprintf('<img src="assets/img/%s" class="fit50" />', fname)
+fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:%d%%;max-height:%d%%;" />', fname, size, size)
+```
+
 ## 目標
 
 - 透過docker快速架設可用的Rstudio Server、http server、各種database
@@ -279,7 +291,19 @@ pkg_count <- function(date) {
 
 ## 啟動mongodb
 
+```sh
+docker run -d --name mongo -p 27017:27017 r-mongo
+```
 
+--- &vcenter .largecontent
+
+## 使用rmongodb
+
+```{r, eval=FALSE}
+library(rmongodb)
+mongo <- mongo.create(host = "192.168.0.50")
+mongo.get.databases(mongo)
+```
 
 --- &vcenter .largecontent
 
@@ -287,15 +311,93 @@ pkg_count <- function(date) {
 
 --- &vcenter .largecontent
 
-## 如何參與Open Source
+## 將統編轉換為公司名稱
+
+```{r, eval = FALSE}
+
+```
 
 --- &vcenter .largecontent
 
-## 建立專案
+## 經驗分享：如何回報bug
+
+<https://github.com/mongosoup/rmongodb/issues/20>
+
+- 清楚的描述環境
+    - `sessionInfo()`
+- 可重現錯誤的程式碼
+- 禮貌、感謝與尊重
 
 --- &vcenter .largecontent
 
-## 參考`rmongodb`
+## 政府標案資料
+
+- DSP
+
+--- &vcenter .largecontent
+
+## 啟動PostgreSQL
+
+```sh
+docker run -d --name r-postgres -p 5432:5432 r-postgres
+```
+
+--- &vcenter .largecontent
+
+## 安裝RPostgreSQL(需要安裝其他相依模組)
+
+--- &vcenter .largecontent
+
+## 利用Docker exec進入container
+
+- 先跑安裝，等待的時候來學Docker
+
+```sh
+docker ps
+docker exec -it rstudio /bin/bash
+apt-get update
+apt-get install libpq5-dev # then y
+```
+
+--- &vcenter .largecontent
+
+## 是時候講解Docker的原理了
+
+`r fit100("container_vs_vm.jpg")`
+
+--- &twocolvcenter .largecontent
+
+## Container And Image
+
+*** =left
+
+### Docker
+
+- image
+- container
+
+*** =right
+
+### 實體機器
+
+- Win7 安裝光碟
+- 一台Win7作業系統的電腦
+
+--- &vcenter .largecontent
+
+## 連結資料庫
+
+```{r}
+install.packages('RPostgreSQL', repos = 'http://192.168.0.50/R')
+library(RPostgreSQL)
+db <- dbConnect(dbDriver("PostgreSQL"), host = "192.168.0.50", 
+                user = "vagrant", password = "vagrant")
+
+```
+
+--- &vcenter .largecontent
+
+## ETL
 
 --- &vcenter .largecontent
 
