@@ -429,17 +429,63 @@ docker run -d --name mongo -p 27017:27017 r-mongo
 
 --- &vcenter .largecontent
 
-## 使用rmongodb
+## 安裝套件`rmongodb`
 
-```{r, eval=FALSE}
-library(rmongodb)
-mongo <- mongo.create(host = "192.168.0.50")
-mongo.get.databases(mongo)
+```r
+install.packages("rmongodb")
 ```
 
 --- &vcenter .largecontent
 
-## 安裝套件`rmongodb`
+## 查詢mongodb的必備知識
+
+- `mongo.create`
+- `mongo.find`
+- cursor related
+    - `mongo.cursor.next`
+    - `mongo.cursor.value`
+- bson related
+    - `mongo.bson.to.list`
+
+--- &vcenter .largecontent
+
+## `mongo.create`
+
+```r
+?mongo.create
+```
+
+--- &vcenter .largecontent
+
+## `mongo.find`和cursor
+
+- Iterator(迭代器)
+- 取值
+- 有沒有下一個
+
+```
+ooo... ==next==> ooo...
+^                 ^
+```
+
+--- &vcenter .largecontent
+
+## R 中有沒有辦法使用類似迭代器的概念?
+
+- `readLines` + connection
+    - 讀一行資料做處理
+    - 處理完畢之後再讀下一行資料
+    - 讀到沒資料或connection被關閉為止
+- 利用bash pipeline `|`來作類似的效果
+
+--- &vcenter .largecontent
+
+## rmongodb的cursor
+
+```
+ooo... ==`mongo.cursor.next`==> ooo...
+^                                ^
+```
 
 --- &vcenter .largecontent
 
@@ -455,7 +501,7 @@ mongo.get.databases(mongo)
 
 - 請模仿講者之前的示範，將統編轉換為公司名稱的功能
     - 函數化
-    - 放入套件
+    - 放入套件VATInfo
 - 更新`DESCRIPTION`
     - 加入`Depends: rmongodb`
 
@@ -467,6 +513,14 @@ mongo.get.databases(mongo)
     - R/
     - DESCRIPTION
     - NAMESPACE
+    
+--- &vcenter .largecontent
+
+## DESCRIPTION
+
+- 各欄位解釋
+- 新增Depends
+- DESCRIPTION和NAMESPACE將在[套件開發](development.html)中再細解
 
 --- &vcenter .largecontent
 
@@ -478,6 +532,20 @@ mongo.get.databases(mongo)
     - `sessionInfo()`
 - 可重現錯誤的程式碼
 - 禮貌、感謝與尊重
+
+--- &vcenter .largecontent
+
+## 一般Open Source軟體對於錯誤回報的處理
+
+1. 確認錯誤（看回報的人多不多、開發者能不能重現錯誤）
+1. 尋找原因（開發者的事情了...）
+1. 徵求貢獻者（開發者有時後會懶的做，拋出來徵求貢獻者）
+1. 測試
+1. 上patch （除非有重大錯誤，否則每個月只能丟CRAN一次）
+
+--- .dark .segue
+
+## SQL Database
 
 --- &vcenter .largecontent
 
@@ -500,6 +568,17 @@ docker run -d --name r-postgres -p 5432:5432 r-postgres
 - 解決方式：
     - google
     - 包好docker，Dockerfile裏面會詳細註明安裝過程
+
+<https://github.com/docker-library/postgres/blob/51e5166d69320581cb707d6fb102d3ba04803400/9.4/Dockerfile>
+
+--- &vcenter .largecontent
+
+## 如何看Dockerfile
+
+- FROM
+- RUN
+- ENV
+- ENTRYPOINT + CMD
 
 --- &vcenter .largecontent
 
@@ -552,7 +631,164 @@ dbListTable(db)
 
 --- &vcenter .largecontent
 
-## ETL
+## 一次全拿
+
+```r
+tenders <- dbReadTable(db, "tenders")
+```
 
 --- &vcenter .largecontent
 
+## 自己下SQL Command
+
+```r
+tenders <- dbGetQuery(db, "SELECT * FROM tenders LIMIT 100")
+```
+
+--- .segue .dark
+
+## 常見問題：中文編碼
+
+--- &vcenter .largecontent
+
+## 編碼知多少
+
+- 位元組(byte)是目前電腦處理記憶體的基本單位。一個位元組有8個位元(bit)。ex: 
+    - 00000001, 00111101
+- 我們可以用兩個hex code來代表一個位元組。ex: 
+    - 00000001 ==> 0000,0001 ==> 0x01
+    - 00111101 ==> 0011,1101 ==> 0x3D
+
+--- &vcenter .largecontent
+
+## 編碼知多少
+
+- 文字的"0"和數字的0，在電腦中是不同的！
+- R 中整數0L的記憶體，寫成hex code是 00 00 00 00 (佔有四個位元組)
+- 數值0.0的記憶體，寫成hex code是 00 00 00 00 00 00 00 00 (佔有八個位元組)
+- 文字"0"的記憶體，寫成hex code是 30 (佔有一個位元組)
+- 「編碼」就是將位元組合變成人類可讀文字的規則。
+    - ASCII: 
+        - 0x30 => "0", 0x41 => "A", 0x61 => "a"
+        - 0x00 => 空字串(NULL)
+
+--- &vcenter .largecontent
+
+## R 如何處理文字`character`？
+
+- 一段文字，就是一塊連續的「位元組」，直到遇到0x00為止
+- 包含0x00的連續位元組，在R 中請使用`RawVector`來處理
+
+--- &vcenter .largecontent
+
+## 萬國碼
+
+- 最初的ASCII 編碼只定義了大部分的英文字母和數字而已
+- 各國自行擴充編碼，台灣：big-5
+- 世界統一的編碼，UTF
+    - UTF-8: 每一個「字」可能是1或2個位元組，中間絕對不會有`NULL`
+
+--- &vcenter .largecontent
+
+## R 的編碼錯誤訊息
+
+```
+## Error: 無效的多位元組字串於
+## '<bb>O<a5>_<a5><ab><ac>F<a9><b2>ĵ<b9><c1>`<a7><bd>'
+```
+
+```
+## Error: 
+## line 1 appears to contain embedded nulls
+```
+
+--- &vcenter .largecontent
+
+## SQL資料庫中解決編碼問題
+
+```r
+SET NAMES 'utf-8';
+```
+
+--- &vcenter .largecontent
+
+## 將相關功能加入VATInfo
+
+- 請建立一個函數，給定統一編號，查出所有該編號有參與的標案
+- 輸出請確定型態是`data.frame`
+
+--- .dark .segue
+
+## R 的資料型態（進階）
+
+--- &vcenter .largecontent
+
+## R 資料的Atomic Type
+
+- 大家都是向量
+- 所有東西都是Atomic type所組合而成
+    - 常見的資料型態
+        - numeric
+        - logical
+        - integer
+        - character
+
+--- &vcenter .largecontent
+
+## R 中組合成高階物件的方式
+
+- list, data.frame
+- attributes
+- S4
+
+--- &vcenter .largecontent
+
+## list, data.frame
+
+- `iris`
+
+```{r dataframe}
+str(iris)
+```
+
+--- &vcenter .largecontent
+
+## attributes
+
+- `matrix`, `factor`
+
+```
+attributes(iris$Species)
+```
+
+--- &vcenter .largecontent
+
+## An example of list + attributes: S3 
+
+```{r s3}
+g <- lm(dist ~ speed, cars)
+str(head(g))
+```
+
+--- &vcenter .largecontent
+
+## S4 
+
+- `dgCMatrix`
+
+```{r}
+library(Matrix)
+(m <- Matrix(c(0,0,2:0), 3,5))
+str(m)
+```
+
+--- &vcenter .largecontent
+
+## 輸出的型態
+
+- 在一個弱型態語言中，輸出的型態不定會導致後續使用者的不便
+- 
+
+```{r}
+
+```
