@@ -23,23 +23,32 @@ fit50 <- function(fname) sprintf('<img src="assets/img/%s" class="fit50" />', fn
 fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:%d%%;max-height:%d%%;" />', fname, size, size)
 ```
 
-## 目標
+## 學習目標
 
-- 透過docker快速架設可用的Rstudio Server、http server、各種database
-- 解決數種實務上讀取資料的問題
+- Linux 上的命令列環境
+- 如何利用docker快速架設可用的Rstudio Server、http server、各種database
+- Rstudio Server界面、專案管理、版本控制管理
 - 版本控制入門(git)
+- 解決數種實務上讀取資料的問題
 
 --- &vcenter .largecontent
 
 ## 今日環境介紹
 
 - Virtual Box架設的虛擬機器
-- 架設細節均在目錄`materials/vagrant`之下
     - Ubuntu 14.04 from [Vagrant](https://www.vagrantup.com/)
-    - Docker
-    - 虛擬機器的位置應位於`192.168.0.50`
-    - 請利用虛擬機器的GUI ，或ssh agent連線到`192.168.0.50`，帳號密碼為`vagrant/vagrant`
-        - 講者也有準備web-based ssh client，請連線到`https://192.168.0.50:4200`
+    - 已經先行架設好Docker以及數個客製化docker images
+    - 虛擬機器的位置設定於`192.168.0.50`
+
+--- &vcenter .largecontent
+
+## 命令列
+
+- 虛擬機器的GUI
+- 各種ssh client，如: pietty(windows)、openssh(OS X, ubuntu)
+- 講者先準備的web-based ssh client，請用瀏覽器打開`https://192.168.0.50:4200`
+- Rstudio Server shell（但是需先開啟Rstudio Server）
+- 位置：`192.168.0.50`，帳號密碼：`vagrant/vagrant`
 
 --- &vcenter .largecontent
 
@@ -49,7 +58,7 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 <pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rocker/rstudio</code></pre>
 
-- 打開Firefox，在網址輸入：`192.168.0.50:8787`
+- 在支援的瀏覽器輸入：`192.168.0.50:8787`
     - 帳號為：`vagrant`
     - 密碼為：`vagrant`
 
@@ -57,6 +66,28 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 講解docker指令
 講解`-p`([TCP/UDP端口列表](http://zh.wikipedia.org/wiki/TCP/UDP%E7%AB%AF%E5%8F%A3%E5%88%97%E8%A1%A8))
+
+--- &vcenter .largecontent
+
+## Docker 指令詳解：`docker`總覽
+
+```
+```
+
+--- &vcenter .largecontent
+
+## Docker 指令詳解：`docker run`總覽
+
+<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rocker/rstudio</code></pre>
+
+```
+```
+
+--- &vcenter .largecontent
+
+## Docker 指令詳解：查詢images和指令
+
+- Docker Hub
 
 --- &vcenter .largecontent
 
@@ -78,14 +109,16 @@ demo(recursion)
 
 --- &vcenter .largecontent
 
-## 建立新專案
+## 說明`建立新專案`(0.98.1091)
 
-- 操作Rstudio Server建立新專案
-- 設定Build 選項，切換至套件開發模式
-
-*** =pnotes
-
-解釋各種專案、解釋Build 選項
+- Create Project From
+    - New Directory
+    - Existed Directory
+    - Version Control
+- Project Type
+    - Empty Project
+    - R Packages
+    - Shiny Apps
 
 --- &vcenter .largecontent
 
@@ -136,7 +169,7 @@ for(i in seq_along(urls)) {
 }
 ```
 
---- &twocol .largecontent
+--- &twocolvcenter .largecontent
 
 ## R是一個以函數為主體的語言
 
@@ -488,10 +521,6 @@ ooo... ==`mongo.cursor.next`==> ooo...
 
 ## 將統編轉換為公司名稱
 
-```{r, eval = FALSE}
-
-```
-
 --- &vcenter .largecontent
 
 ## 建立套件VATQuery
@@ -618,7 +647,7 @@ apt-get install libpq5-dev # then y
 
 ## 連結資料庫
 
-```{r}
+```{r, eval=FALSE}
 install.packages('RPostgreSQL', repos = 'http://192.168.0.50/R')
 library(RPostgreSQL)
 db <- dbConnect(dbDriver("PostgreSQL"), host = "192.168.0.50", 
