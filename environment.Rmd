@@ -616,7 +616,7 @@ docker run -d --name r-postgres -p 5432:5432 r-postgres
 docker ps
 docker exec -it rstudio /bin/bash
 apt-get update
-apt-get install libpq5-dev # then y
+apt-get install libpq-dev # then y
 ```
 
 - 如果`apt-get update`出現`W: Size of file /var/lib/apt/lists/http.debian.net_debian_dists_jessie_main_binary-amd64_Packages.gz is not what the server reported 9067087 9068269 `，請重新執行
