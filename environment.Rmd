@@ -105,10 +105,7 @@ demo(recursion)
 - 我們想要抓取每天的套件下載量作分析
 - 講師已經預先把12月份的資料至於虛擬機器之中，請執行：
 
-<pre><code style="font-size:80%">docker run -d --name httpd \
-  -v /home/vagrant/www:/usr/local/apache2/htdocs -p 80:80 \
-  httpd:latest
-</code></pre>
+<pre><code style="font-size:80%">docker run -d --name httpd -v /home/vagrant/www:/usr/local/apache2/htdocs -p 80:80 httpd:latest</code></pre>
 
 *** =pnotes
 
@@ -787,8 +784,21 @@ str(m)
 ## 輸出的型態
 
 - 在一個弱型態語言中，輸出的型態不定會導致後續使用者的不便
-- 
+- 型態檢查是必要的：`is.xxx`, xxx為型態名稱
+- 檢查TRUE/FALSE時，建議用`isTRUE`
 
-```{r}
+```{r typecheck}
+if (NA) print("true") else print("false")
+if (isTRUE(NA)) print("true") else print("false")
+```
 
+--- &vcenter .largecontent
+
+## 輸出的型態範例：矩陣
+
+```{r matrix}
+m <- matrix(1:4, 2, 2)
+m[,1]
+m[,1,drop=FALSE]
+# ?`[`
 ```
