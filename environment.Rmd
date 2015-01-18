@@ -56,7 +56,7 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 - 請在命令列輸入：
 
-<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rocker/rstudio</code></pre>
+<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rstudio-build</code></pre>
 
 - 在支援的瀏覽器輸入：`192.168.0.50:8787`
     - 帳號為：`vagrant`
@@ -78,7 +78,7 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 ## Docker 指令詳解：`docker run`總覽
 
-<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rocker/rstudio</code></pre>
+<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rstudio-build</code></pre>
 
 ```
 ```
@@ -138,7 +138,7 @@ demo(recursion)
 - 我們想要抓取每天的套件下載量作分析
 - 講師已經預先把12月份的資料至於虛擬機器之中，請執行：
 
-<pre><code style="font-size:80%">docker run -d --name httpd -v /home/vagrant/www:/usr/local/apache2/htdocs -p 80:80 httpd:latest</code></pre>
+<pre><code style="font-size:80%">docker run -d --name httpd -v /home/vagrant/www:/usr/local/apache2/htdocs -p 80:80 httpd</code></pre>
 
 *** =pnotes
 
@@ -830,4 +830,11 @@ m <- matrix(1:4, 2, 2)
 m[,1]
 m[,1,drop=FALSE]
 # ?`[`
+```
+
+--- &vcenter .largecontent
+
+```
+docker cp rstudio:/home/vagrant/CRANLog_1.1.tar.gz .
+docker run --rm -v /home/vagrant/www/R/src/contrib:/src rstudio-build Rscript -e "tools::write_PACKAGES('/src')"
 ```
