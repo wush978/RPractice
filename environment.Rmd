@@ -98,9 +98,9 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 COPY userconf.sh /usr/bin/userconf.sh
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN mkdir -p /var/log/supervisor \
-&& chgrp staff /var/log/supervisor \
-&& chmod g+w /var/log/supervisor \
-&& chgrp staff /etc/supervisor/conf.d/supervisord.conf
+  && chgrp staff /var/log/supervisor \
+  && chmod g+w /var/log/supervisor \
+  && chgrp staff /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 8787
 ```
 
@@ -124,54 +124,46 @@ EXPOSE 8787
 
 --- &vcenter .largecontent
 
-- 在支援的瀏覽器輸入：`192.168.0.50:8787`
-    - 帳號為：`vagrant`
-    - 密碼為：`vagrant`
-
-*** =pnotes
-
-講解docker指令
-講解`-p`([TCP/UDP端口列表](http://zh.wikipedia.org/wiki/TCP/UDP%E7%AB%AF%E5%8F%A3%E5%88%97%E8%A1%A8))
-
---- &vcenter .largecontent
-
 ## Docker 指令詳解：`docker`總覽
 
 ```
+Usage: docker [OPTIONS] COMMAND [arg...]
+    cp        Copy files/folders from a container's filesystem to the host path
+    exec      Run a command in an existing container
+    images    List images
+    rm        Remove one or more containers
+    rmi       Remove one or more images
+    run       Run a command in a new container
 ```
 
 --- &vcenter .largecontent
 
 ## Docker 指令詳解：`docker run`總覽
 
-<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rstudio-build</code></pre>
+<pre><code style="font-size:80%">
+docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rstudio-build
 
-```
-```
+Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+-e, --env=[]               Set environment variables
+-i, --interactive=false    Keep STDIN open even if not attached
+-t, --tty=false            Allocate a pseudo-TTY
+-v, --volume=[]            Bind mount a volume (e.g., from the host: -v /host:
+-p, --publish=[]           Publish a container's port to the host
+</code></pre>
 
 --- &vcenter .largecontent
 
-## Docker 指令詳解：查詢images和指令
+## 登入Rstudio
 
-- Docker Hub
+- 在支援的瀏覽器輸入：`<ip>:8787`
+    - 帳號為：`vagrant`
+    - 密碼為：`vagrant`
 
 --- &vcenter .largecontent
 
 ## Rstudio 界面解說
 
 - 四塊工作區的功能解說
-- 命令列的功能解說與示範
-- 展示說明文件
-- 展示`example`和`demo`
-
-*** =pnotes
-
-```r
-demo(is.things)
-demo(error.catching)
-demo(scoping)
-demo(recursion)
-```
 
 --- &vcenter .largecontent
 
@@ -206,13 +198,18 @@ demo(recursion)
 
 <pre><code style="font-size:80%">docker run -d --name httpd -v /home/vagrant/www:/usr/local/apache2/htdocs -p 80:80 httpd</code></pre>
 
-*** =pnotes
+--- &vcenter .largecontent
 
-講解`-v`
+## [Docker Hub](https://hub.docker.com)
+
+- Docker Images的集散地
+- 尋找你需要用到的服務
+- 閱讀Image的使用說明
+- 一行就可以架測試用或內部用的網站
 
 --- &vcenter .largecontent #download_script
 
-## 範例下載script =
+## 範例下載script
 
 （修改自<http://cran-logs.rstudio.com/>上的範例）
 
@@ -228,7 +225,7 @@ missing_days <- setdiff(all_days, tools::file_path_sans_ext(dir(), TRUE))
 class(missing_days) <- "Date"
 # 拼湊出下載連結
 year <- as.POSIXlt(all_days)$year + 1900
-urls <- paste0('http://192.168.0.50/cran-log/', year, '/', missing_days, '.csv.gz')
+urls <- paste0('http://<ip>/cran-log/', year, '/', missing_days, '.csv.gz')
 # 可以使用download.file來做下載
 for(i in seq_along(urls)) {
   download.file(urls[i], destfile = sprintf("%s.csv.gz", missing_days[i]))
@@ -261,21 +258,6 @@ for(i in seq_along(urls)) {
 
 --- &vcenter .largecontent
 
-## 追程式碼的技巧
-
-- 檢視函數物件
-- 檢視S3方法
-- 檢視套件中的隱藏物件（介紹`::`和`:::`）
-
-```r
-print
-methods(print)
-print.acf
-stats:::print.acf
-```
-
---- &vcenter .largecontent
-
 ## 讀取資料
 
 續下載資料的程式
@@ -289,13 +271,6 @@ head(sort(table(data$package), decreasing = TRUE))
 ##     digest        DBI       plyr manipulate       Rcpp    ggplot2 
 ##      1009        973        896        877        867        817 
 ```
-
-*** =pnotes
-
-- `read.table`
-- `sort`
-- `table`
-- `$`
 
 --- &vcenter .largecontent
 
@@ -313,12 +288,18 @@ head(sort(table(data$package), decreasing = TRUE))
 ```r
 pkg_count <- function(date) {
   year <- as.POSIXlt(date)$year + 1900
-  urls <- paste0('http://192.168.0.50/cran-log/', year, '/', date, '.csv.gz')
+  urls <- paste0('http://<ip>/cran-log/', year, '/', date, '.csv.gz')
   download.file(urls, destfile = sprintf("%s.csv.gz", date))
   data <- read.table(sprintf("%s.csv.gz", date), header = TRUE, sep = ",")
   sort(table(data$package), decreasing = TRUE)
 }
 ```
+
+--- &vcenter .largecontent
+
+## 函數、環境和Scoping
+
+- 每一個變數，R 需要找出它真實的意義
 
 --- &vcenter .largecontent
 
@@ -497,7 +478,7 @@ tools::write_PACKAGES(".")
 
 ```r
 install.packages("CRANLogPkg", 
-  repos = "http://192.168.0.50/R",
+  repos = "http://<ip>/R",
   type = "source")
 ```
 
@@ -676,7 +657,7 @@ docker run -d --name r-postgres -p 5432:5432 r-postgres
 
 ## 利用Docker exec進入container
 
-- 先跑安裝，等待的時候來學Docker
+- 安裝libpq-dev
 
 ```sh
 docker ps
@@ -692,9 +673,9 @@ apt-get install libpq-dev # then y
 ## 連結資料庫
 
 ```{r, eval=FALSE}
-install.packages('RPostgreSQL', repos = 'http://192.168.0.50/R')
+install.packages('RPostgreSQL', repos = 'http://<ip>/R')
 library(RPostgreSQL)
-db <- dbConnect(dbDriver("PostgreSQL"), host = "192.168.0.50", 
+db <- dbConnect(dbDriver("PostgreSQL"), host = "<ip>", 
                 user = "vagrant", password = "vagrant")
 dbListTable(db)
 ```
