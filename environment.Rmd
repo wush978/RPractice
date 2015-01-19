@@ -38,7 +38,14 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 - Virtual Box架設的虛擬機器
     - Ubuntu 14.04 from [Vagrant](https://www.vagrantup.com/)
     - 已經先行架設好Docker以及數個客製化docker images
-    - 虛擬機器的位置設定於`192.168.0.50`
+    - 預設ip為`192.168.0.50`
+        - 如本機端無法連線至`192.168.0.50`，請將ip更改為dhcp(按p看指令)
+
+*** =pnotes
+
+```
+
+```
 
 --- &vcenter .largecontent
 
@@ -46,9 +53,10 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 - 虛擬機器的GUI
 - 各種ssh client，如: pietty(windows)、openssh(OS X, ubuntu)
-- 講者先準備的web-based ssh client，請用瀏覽器打開`https://192.168.0.50:4200`
+- 講者先準備的web-based ssh client，請用瀏覽器打開`https://<vm ip>:4200`
 - Rstudio Server shell（但是需先開啟Rstudio Server）
 - 位置：`192.168.0.50`，帳號密碼：`vagrant/vagrant`
+    - 如果替換成`dhcp`，請利用`ifconfig eth1`來查看ip
 
 --- &vcenter .largecontent
 
@@ -57,6 +65,64 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 - 請在命令列輸入：
 
 <pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rstudio-build</code></pre>
+
+- 等待Rstudio Server開啟，請聽講者解釋何謂docker
+
+--- &vcenter .largecontent
+
+## 2014年IT界最受矚目的專案：docker
+
+- Docker 是一種Virtual Container的技術，一種類似Virtual Machine的技術
+
+`r fit100("container_vs_vm.jpg")`
+
+--- &vcenter .largecontent
+
+## Docker 生態系
+
+- 幾乎所有Linux服務，只要一行即可執行
+- 差異化硬碟，充分節省頻寬和硬碟
+- 啟動快速，數秒就可開啟新的服務
+- Dockerfile讓人人可充分交流安裝過程
+
+--- &vcenter .largecontent
+
+## R and Docker
+
+- [rocker](https://github.com/rocker)
+- 今天的Rstudio Server改自rocker/rstudio
+- Dockerfile
+
+```
+## User config and supervisord for persistant RStudio session
+COPY userconf.sh /usr/bin/userconf.sh
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN mkdir -p /var/log/supervisor \
+&& chgrp staff /var/log/supervisor \
+&& chmod g+w /var/log/supervisor \
+&& chgrp staff /etc/supervisor/conf.d/supervisord.conf
+EXPOSE 8787
+```
+
+--- &twocolvcenter .largecontent
+
+## Container And Image
+
+*** =left
+
+### Docker
+
+- image
+- container
+
+*** =right
+
+### 實體機器
+
+- Win7 安裝光碟
+- 一台Win7作業系統的電腦
+
+--- &vcenter .largecontent
 
 - 在支援的瀏覽器輸入：`192.168.0.50:8787`
     - 帳號為：`vagrant`
@@ -618,30 +684,6 @@ docker exec -it rstudio /bin/bash
 apt-get update
 apt-get install libpq5-dev # then y
 ```
-
---- &vcenter .largecontent
-
-## 是時候講解Docker的原理了
-
-`r fit100("container_vs_vm.jpg")`
-
---- &twocolvcenter .largecontent
-
-## Container And Image
-
-*** =left
-
-### Docker
-
-- image
-- container
-
-*** =right
-
-### 實體機器
-
-- Win7 安裝光碟
-- 一台Win7作業系統的電腦
 
 --- &vcenter .largecontent
 
