@@ -29,7 +29,6 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 - 台灣大學電機工程學研究所博士生
 - Taiwan R User Group 共同創辦人
-- 資料科學愛好者年會 - 課程總召
 - R 套件相關著作
     - [FeatureHashing](http://cran.r-project.org/web/packages/FeatureHashing/index.html)和[RMessenger](http://cran.r-project.org/web/packages/RMessenger/)的作者
     - [knitr](http://cran.r-project.org/web/packages/knitr/) 的推廣者和小貢獻者
@@ -102,17 +101,7 @@ wordcloud(tools, freq, random.color = TRUE, colors = pal)
 
 --- &vcenter .largecontent
 
-## R 是一種泛用的軟體工具
-
-- 能做的事情，和所有其他工具(Python, PHP, Java, ...)一樣多
-- R 的底層是C ，可以簡單和以C 為基底的工具(Python, PHP, nodejs)串接
-    - [Call Python from R through Rcpp](http://gallery.rcpp.org/articles/rcpp-python/)
-- [rJava] 讓R 也可以和Java Based的工具串接
-    - RcppHDFS
-
---- &vcenter .largecontent
-
-## R 在軟體工具中的定位
+## R 特別擅長用於
 
 - 資料處理
 - 資料分析
@@ -120,106 +109,17 @@ wordcloud(tools, freq, random.color = TRUE, colors = pal)
 
 --- &vcenter .largecontent
 
-## 軟體工程
+## R 軟體套件開發實務應用
 
-- 程式碼的寫作是有功力深厚之別
-    - 可以在自己的電腦上跑
-    - 可以在別人的電腦上跑
-    - 可以讀、可以改
-    - 穩健
-
---- &vcenter .largecontent
-
-## 我們希望有些程式碼可以重新使用
-
-- Copy & Paste
-
-```r
-g1 <- lm(revenue ~ weekday + sales, data)
-summary(g1)$r.squared
-# ...
-g2 <- lm(revenue ~ weekday * sales, data)
-summary(g2)$r.squared
-```
-
-- 要改的時候非常麻煩
-
-*** =pnotes
-
-如果要把`lm`改成`glm`呢？
-
---- &vcenter .largecontent
-
-## 我們希望有些程式碼可以重新使用
-
-- 和同仁交流
-
-```r
-library(RPostgreSQL)
-con <- dbConnect(dbDriver("PostgreSQL"), host = "192.168.0.50")
-data <- dbReadTable(con, "sales-2015-01-05")
-```
-
-- `RPostgreSQL`可能裝不起來
-- 資料庫換位置怎麼辦？
-
---- &vcenter .largecontent
-
-## 我們希望有些程式碼可以重新使用
-
-- 例行報表
-
-```r
-library(xtable)
-out <- xtable(summary(g1))
-```
-
-- 每天都要跑，能不能自動化？
-
---- &vcenter .largecontent
-
-## Analysis as Packages
-
-- [Duncan Murdoch 精彩地解釋為什麼要寫套件(Packages)和文章(Vignettes)](http://www.stats.uwo.ca/faculty/murdoch/ism2013/5Vignettes.pdf)
-- [Robert M Flight 提供利用套件做分析的見解](http://rmflight.github.io/posts/2014/07/analyses_as_packages.html)
-
---- &vcenter .largecontent
-
-## Duncan Murdoch：套件提供了以下功能
-
-- 完整的函數和資料
-- 伴隨著R 內的說明文件和R 外的文章
-- 和其他語言的整合（C 、C++ 、Java）
-- 正確性的檢查機制
-
---- &vcenter .largecontent
-
-## Robert M Flight：為分析寫套件
-
-- 讓自己的程式碼更「完整」
-- 利用R 對文章撰寫的支援來製作報告
-
---- &vcenter .largecontent
-
-## Wush Wu：讓分析流程自動化
-
-- 和其他工具更好地整合
-- 包裝成套件可以解決自動化之後的問題
-    - 自動測試
-    - 自動更新
-
---- &vcenter .largecontent
-
-## 開發內部使用的R 套件很簡單
-
-<h1 class="big">感謝Hadley Wickham</h1>
-
-- Rstudio 完整的支援開發套件的種種功能
-    - 安裝
-    - 測試
-    - 文件
-    - 版本控制
-    - C++
+- 套件是散布R 的程式碼的最完整方式
+    - 完整的相依性設定
+    - 配備有範例資料與範例文件
+    - 輕鬆的開發流程
+- 不只是為了別人寫套件，而是為了自己寫套件
+    - 將例行性的工作包裝成函數
+    - 利用`roxygen2`相容的方式撰寫註解
+    - 將類似目的的函數們包裝成套件
+    - 利用github建立雲端套件庫，或自行架設私有套件庫
 
 --- &vcenter .largecontent
 
@@ -235,9 +135,10 @@ out <- xtable(summary(g1))
 ## 我的目標
 
 - 帶給大家真正有用的技術
-    - 以最方便和最簡單的方式建立開發環境（[docker](https://www.docker.com/)）
+    - 以最方便和最簡單的方式建立開發環境（rstudio，[docker](https://www.docker.com/)）
     - 最新和最少，也最重要的軟體工程相關工具介紹（[git](http://git-scm.com/) 、[github](https://github.com/)）
-    - 最新的製作套件相關的技術（R ）
+    - 最新的製作套件相關的技術（rstudio, roxygen2, RUnit, travis-ci）
+    - 個人經驗（jenkins）
 
 --- &vcenter .largecontent
 
