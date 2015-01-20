@@ -80,7 +80,7 @@ sudo ifup eth1
 
 <pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rstudio-build</code></pre>
 
-- 等待Rstudio Server開啟，請聽講者解釋何謂docker
+- 需等待Rstudio Server開啟，趁機學Docker
 
 --- &vcenter .largecontent
 
@@ -103,11 +103,12 @@ sudo ifup eth1
 
 ## R and Docker
 
-- [rocker](https://github.com/rocker)
-- 今天的Rstudio Server改自rocker/rstudio
+- [rocker](https://github.com/rocker-org/rocker)
+- 今天的Rstudio Server改自[rocker/rstudio](https://registry.hub.docker.com/u/rocker/rstudio/)
 - Dockerfile
 
 ```
+...
 ## User config and supervisord for persistant RStudio session
 COPY userconf.sh /usr/bin/userconf.sh
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -116,22 +117,19 @@ RUN mkdir -p /var/log/supervisor \
   && chmod g+w /var/log/supervisor \
   && chgrp staff /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 8787
+...
 ```
 
---- &twocolvcenter .largecontent
+--- &vcenter .largecontent
 
 ## Container And Image
 
-*** =left
-
-### Docker
+### Docker中的...
 
 - image
 - container
 
-*** =right
-
-### 實體機器
+### 如同現實中的...
 
 - Win7 安裝光碟
 - 一台Win7作業系統的電腦
@@ -173,11 +171,16 @@ Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
     - 帳號為：`vagrant`
     - 密碼為：`vagrant`
 
---- &vcenter .largecontent
+--- .largecontent
 
 ## Rstudio 界面解說
 
-- 四塊工作區的功能解說
+<center>
+- 工作區的功能解說
+
+
+`r fit100("rstudioserver.jpg")`
+</center>
 
 --- &vcenter .largecontent
 
