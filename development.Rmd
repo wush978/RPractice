@@ -1,0 +1,43 @@
+---
+title       : R 軟體套件開發實務應用- 套件開發
+subtitle    : 
+author      : Wush Wu
+job         : 
+framework   : io2012-wush
+highlighter : highlight.js
+hitheme     : zenburn
+widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+--- &vcenter .largecontent
+
+```{r setup, include=FALSE, cache=FALSE}
+suppressPackageStartupMessages({
+  library(knitr)
+  library(wordcloud)
+  library(RColorBrewer)
+})
+opts_chunk$set(echo = FALSE, cache = FALSE)
+fit100 <- function(fname) sprintf('<img src="assets/img/%s" class="fit100" />', fname)
+fit50 <- function(fname) sprintf('<img src="assets/img/%s" class="fit50" />', fname)
+fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:%d%%;max-height:%d%%;" />', fname, size, size)
+```
+
+## 學習目標
+
+- 了解DESCRIPTION和NAMESPACE
+- 撰寫套件的文件
+- 測試套件
+- 避免名稱的混亂，學習Imports和Depends的不同
+
+--- &vcenter .largecontent
+
+## 文件
+
+- 撰寫套件的文件
+    - 標題
+    - 參數
+    - 回傳值的說明
+    - 細節說明
+    - 範例
+    - 數學公式
