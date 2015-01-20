@@ -43,8 +43,22 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 *** =pnotes
 
+### 手動方法
+
+利用指令`sudo nano /etc/network/interfaces`打開設定檔案並將`static`置換為`dhcp`後存檔
+
+### 打字
+
+```
+sed "s/static/dhcp/" < /etc/network/interfaces > /tmp/interfaces
+sudo mv /tmp/interfaces /etc/network/interfaces
 ```
 
+### 重新啟動網路
+
+```
+sudo ifdown eth1
+sudo ifup eth1
 ```
 
 --- &vcenter .largecontent
