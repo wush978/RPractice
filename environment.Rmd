@@ -30,6 +30,7 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 - Rstudio Server界面、專案管理、版本控制管理
 - 版本控制入門(git)
 - 解決數種實務上讀取資料的問題
+- 將功能整合至套件之中
 
 --- &vcenter .largecontent
 
@@ -460,6 +461,8 @@ dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
 - 請跟著講師操作
     - 打包套件
     - 在終端機將套件複製到`~/www/R/src/contrib`
+        - 切換到`~/www/R/src/contrib`
+        - `docker cp rstudio:/home/vagrant/CRANLog_1.1.tar.gz .`
     - 在該目錄下更新套件資訊（`PACKAGES`, `PACKAGES.gz`）（卡住）
 
 *** =pnotes
@@ -473,19 +476,53 @@ dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
 - shell
 
 ```sh
-docker run -v `pwd`:/src -it --rm rocker/rstudio R
+cd /home/vagrant/www/R/src/contrib
+docker run -v `pwd`:/src -w /src -it --rm rstudio-build R
 ```
 
 - R
 
 ```r
-setwd("/src")
 tools::write_PACKAGES(".")
 ```
 
 *** =pnotes
 
 工作目錄的概念
+
+---&vcenter .largecontent 
+
+## Rscript
+
+```
+Usage: /path/to/Rscript [--options] [-e expr [-e expr2 ...] | file] [args]
+
+--options accepted are
+  --help              Print usage and exit
+  --version           Print version and exit
+  --verbose           Print information on progress
+  --default-packages=list
+                      Where 'list' is a comma-separated set
+                        of package names, or 'NULL'
+or options to R, in addition to --slave --no-restore, such as
+  --save              Do save workspace at the end of the session
+  --no-environ        Don't read the site and user environment files
+  --no-site-file      Don't read the site-wide Rprofile
+  --no-init-file      Don't read the user R profile
+  --restore           Do restore previously saved objects at startup
+  --vanilla           Combine --no-save, --no-restore, --no-site-file
+                        --no-init-file and --no-environ
+```
+
+--- &vcenter .largecontent
+
+## 將Rscript和docker run結合
+
+```
+cd /home/vagrant/www/R/src/contrib
+docker run -v `pwd`:/src -w /src -it --rm rstudio-build \
+  Rscript -e "tools::write_PACKAGES('.')"
+```
 
 --- &vcenter .largecontent
 
@@ -494,14 +531,10 @@ tools::write_PACKAGES(".")
 - 可能需要重新啟動R
 
 ```r
-install.packages("CRANLogPkg", 
+install.packages("<pkg name>", 
   repos = "http://<ip>/R",
   type = "source")
 ```
-
-*** =pnotes
-
-原理待日後再細解
 
 --- &vcenter .largecontent
 
@@ -526,6 +559,8 @@ docker run -d --name mongo -p 27017:27017 r-mongo
 ## 安裝套件`rmongodb`
 
 ```r
+# http proxy
+Sys.setenv(http_proxy="<proxy location>")
 install.packages("rmongodb")
 ```
 
@@ -603,7 +638,7 @@ ooo... ==`mongo.cursor.next`==> ooo...
     - R/
     - DESCRIPTION
     - NAMESPACE
-    
+
 --- &vcenter .largecontent
 
 ## DESCRIPTION
@@ -663,43 +698,34 @@ docker run -d --name r-postgres -p 5432:5432 r-postgres
 
 --- &vcenter .largecontent
 
-## 如何看Dockerfile
-
-- FROM
-- RUN
-- ENV
-- ENTRYPOINT + CMD
-
---- &vcenter .largecontent
-
 ## 利用Docker exec進入container
 
 - 安裝libpq-dev
 
 ```sh
-docker ps
-docker exec -it rstudio /bin/bash
+docker ps # 列出現在正在跑的Docker Containers
+docker exec -it rstudio /bin/bash # 在Docker Containers之中執行指令
 apt-get update
 apt-get install libpq-dev # then y
 ```
 
-- 如果`apt-get update`出現`W: Size of file /var/lib/apt/lists/http.debian.net_debian_dists_jessie_main_binary-amd64_Packages.gz is not what the server reported 9067087 9068269 `，請重新執行
+- 如果`apt-get libpq-dev`出現錯誤，請再`apt-get update`一次試試看
 
 --- &vcenter .largecontent
 
 ## 連結資料庫
 
-```{r, eval=FALSE}
+```r
 install.packages('RPostgreSQL', repos = 'http://<ip>/R')
 library(RPostgreSQL)
 db <- dbConnect(dbDriver("PostgreSQL"), host = "<ip>", 
                 user = "vagrant", password = "vagrant")
-dbListTable(db)
+dbListTables(db)
 ```
 
 --- &vcenter .largecontent
 
-## 一次全拿
+## `dbReadTable`
 
 ```r
 tenders <- dbReadTable(db, "tenders")
@@ -707,10 +733,10 @@ tenders <- dbReadTable(db, "tenders")
 
 --- &vcenter .largecontent
 
-## 自己下SQL Command
+## SQL Command
 
 ```r
-tenders <- dbGetQuery(db, "SELECT * FROM tenders LIMIT 100")
+tenders <- dbGetQuery(db, "SELECT * FROM tenders LIMIT 1")
 ```
 
 --- .segue .dark
@@ -774,38 +800,95 @@ tenders <- dbGetQuery(db, "SELECT * FROM tenders LIMIT 100")
 
 ## SQL資料庫中解決編碼問題
 
-```r
-SET NAMES 'utf-8';
+```sql
+SET NAMES 'UTf-8';
+SET NAMES 'BIG5';
 ```
 
 --- &vcenter .largecontent
 
-## 將相關功能加入VATInfo
+## 試著讀取BIG5 看看亂碼
+
+```r
+dbGetQuery(db, "SET NAMES 'BIG5';")
+dbGetQuery(db, "SELECT * FROM tenders LIMIT 1;")
+```
+
+--- &vcenter .largecontent
+
+## dplyr 整理資料的好幫手
+
+```r
+install.packages('dplyr', repos = 'http://<ip>/R')
+```
+
+--- &vcenter .largecontent
+
+## dplyr 的常用函數
+
+<center>`r fit100("R_ETL_Fn1.png")`</center>
+
+取自[資料科學愛好者年會 ETL課程](https://ntuaha.github.io/R_ETL_LAB)
+
+--- &vcenter .largecontent
+
+## 查詢廠商參與的標案
+
+```r
+colnames(tenders)
+# 查詢統一編號70794974所參與的標案，這裡的「統一編號」即「廠商代碼」
+filter(tenders, 廠商代碼 == "70794974")
+# 取得標案的id
+select(filter(tenders, 廠商代碼 == "70794974"), pkAtmMain)
+# 去除重複的標案id
+unique(select(filter(tenders, 廠商代碼 == "70794974"), pkAtmMain))
+```
+
+--- &vcenter .largecontent
+
+## %>%, [magrittr](http://cran.r-project.org/web/packages/magrittr/index.html)
+
+```r
+# 去除重複的標案id
+unique(select(filter(tenders, 廠商代碼 == "70794974"), pkAtmMain))
+library(magrittr)
+filter(tenders, 廠商代碼 == "70794974") %>%
+  select(pkAtmMain) %>%
+  unique
+```
 
 - 請建立一個函數，給定統一編號，查出所有該編號有參與的標案
-- 輸出請確定型態是`data.frame`
+- 再建立一個函數，給定標案id，查出有參與該標案的統一編號
+- 將這兩個函數加入套件VATInfo之中
+- VATInfo套件的Depends需加入RPostgreSQL和dplyr
+
+--- &vcenter .largecontent
+
+## 型態問題
+
+- 這裡的「統一編號」或「廠商代碼」是數字還是字串？
 
 --- .dark .segue
 
-## R 的資料型態（進階）
+## R 的資料型態
 
 --- &vcenter .largecontent
 
 ## R 資料的Atomic Type
 
-- 大家都是向量
-- 所有東西都是Atomic type所組合而成
+- Atomic type都是向量
     - 常見的資料型態
         - numeric
         - logical
         - integer
         - character
+- 其餘資料物件都是Atomic type所組合而成
 
 --- &vcenter .largecontent
 
 ## R 中組合成高階物件的方式
 
-- list, data.frame
+- list, data.frame, environment
 - attributes
 - S4
 
@@ -815,7 +898,7 @@ SET NAMES 'utf-8';
 
 - `iris`
 
-```{r dataframe}
+```{r dataframe, echo=TRUE}
 str(iris)
 ```
 
@@ -833,7 +916,7 @@ attributes(iris$Species)
 
 ## An example of list + attributes: S3 
 
-```{r s3}
+```{r s3, echo=TRUE}
 g <- lm(dist ~ speed, cars)
 str(head(g))
 ```
@@ -844,7 +927,7 @@ str(head(g))
 
 - `dgCMatrix`
 
-```{r}
+```{r, echo=TRUE}
 library(Matrix)
 (m <- Matrix(c(0,0,2:0), 3,5))
 str(m)
@@ -854,11 +937,13 @@ str(m)
 
 ## 輸出的型態
 
-- 在一個弱型態語言中，輸出的型態不定會導致後續使用者的不便
-- 型態檢查是必要的：`is.xxx`, xxx為型態名稱
+- 在一個弱型態語言中，告知使用者輸出的型態能帶給後續使用者很大的方便
+- 建立函數時，如果能確定型態，對於後續的處理會更方便
+    - 範例：統一編號
+-`is.xxx`, xxx為型態名稱
 - 檢查TRUE/FALSE時，建議用`isTRUE`
 
-```{r typecheck}
+```{r typecheck, echo=TRUE}
 if (NA) print("true") else print("false")
 if (isTRUE(NA)) print("true") else print("false")
 ```
@@ -867,16 +952,139 @@ if (isTRUE(NA)) print("true") else print("false")
 
 ## 輸出的型態範例：矩陣
 
-```{r matrix}
+```{r matrix, echo=TRUE}
 m <- matrix(1:4, 2, 2)
 m[,1]
 m[,1,drop=FALSE]
 # ?`[`
 ```
 
+--- .dark .segue
+
+## list 和 environment
+
 --- &vcenter .largecontent
 
+## 常見的問題
+
+```r
+a1 <- 1
+a2 <- 2
+a3 <- 3
+a4 <- 4
+a5 <- 5
+df <- data.frame(a = c(a1, a2, a3, a4, a5))
 ```
-docker cp rstudio:/home/vagrant/CRANLog_1.1.tar.gz .
-docker run --rm -v /home/vagrant/www/R/src/contrib:/src rstudio-build Rscript -e "tools::write_PACKAGES('/src')"
+
+- 能不能用迴圈來寫`c(a1, a2, a3, a4, a5)`？
+- 利用`1:5`建立字串`c("a1", "a2", "a3", "a4", "a5")`
+    - `paste("a", 1:5, sep="")`、`paste0("a", 1:5)`
+    - `sprintf("a%d", 1:5)`
+
+--- &vcenter .largecontent
+
+## List
+
+- Atomic Type是某種資料的向量
+- `list`是「R 物件」的向量
+- `list`中的物件可以建立「姓名」（key）
+
+```r
+x <- list()
+for(i in 1:5) x[[paste0("a", i)]] <- i
+df <- data.frame(a = unlist(x))
 ```
+
+--- &vcenter .largecontent
+
+## `[`和`[[`
+
+- 相同點
+    - 兩者都可以接名稱或整數
+        - `x[key];x[[key]]`
+        - `x[i];x[[i]]`
+- 相異點
+    - `[`會維持型態
+    - `[[`會改變型態
+
+--- &vcenter .largecontent
+
+## Environment
+
+- 如果已經有了`a1`到`a5`的物件了呢...
+
+```r
+a1 <- 1
+a2 <- 2
+a3 <- 3
+a4 <- 4
+a5 <- 5
+```
+
+--- &vcenter .largecontent
+
+## Environment管理變數和物件之間的關係
+
+```
+a1 --> 1
+a2 --> 2
+...
+a5 --> 5
+```
+
+- 字串==>物件
+- 類似`list`
+
+--- &vcenter .largecontent
+
+## `globalenv()`
+
+```
+env <- environment() #globalenv()
+env[["a1"]]
+x <- c()
+for(i in 1:5) x[i] <- env[[paste0("a", i)]]
+```
+
+--- .segue .dark
+
+## 練習專案
+
+--- &vcenter .largecontent
+
+## VATInfo
+
+- 已完成
+    - 將統編轉換為公司名稱
+    - 給統編，查詢有參與的政府標案id
+    - 給政府標案id，查詢有參與的公司統編
+- 請再完成「給統編，查詢公司的董監事」
+
+*** =pnotes
+
+```r
+library(rmongodb)
+mongo <- mongo.create(<ip>)
+id <- "70794974"
+cursor <- mongo.find(mongo, "twcom.boards", list(id = id))
+retval <- c()
+while(mongo.cursor.next(cursor)) {
+  obj <- mongo.bson.to.list(mongo.cursor.value(cursor))
+  retval <- c(retval, obj$name)
+}
+retval
+```
+
+--- &vcenter .largecontent
+
+## VATInfo
+
+- 請利用VATInfo來完成以下目標：
+    - 請列出"70794974"的董監事
+    - 請列出"70794974"有參與的政府標案
+    - 請查出參與這些標案的公司統編
+    - 請再查詢這些公司的董監事
+
+--- &vcenter .largecontent
+
+## Q&A
