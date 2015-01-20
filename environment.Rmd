@@ -545,6 +545,7 @@ install.packages("<pkg name>",
 - 在製作報表的時候，<font color="red">常常</font>需要將代碼轉譯回人類可讀的文字
     - 重複的程式碼
     - 客製化
+- 資料來源：[twcom(g0v)](https://github.com/WeiChengLiou/twcom)
 
 --- &vcenter .largecontent
 
@@ -620,6 +621,16 @@ ooo... ==`mongo.cursor.next`==> ooo...
 
 ## 將統編轉換為公司名稱
 
+```r
+library(rmongodb)
+mongo <- mongo.create(<ip>)
+id <- "70794974"
+cursor <- mongo.find(mongo, "twcom.cominfo", list(id = id))
+mongo.cursor.next(cursor)
+obj <- mongo.bson.to.list(mongo.cursor.value(cursor))
+obj$name
+```
+
 --- &vcenter .largecontent
 
 ## 建立套件VATQuery
@@ -676,7 +687,7 @@ ooo... ==`mongo.cursor.next`==> ooo...
 
 ## 政府標案資料
 
-- 資料來源：[DSP](http://dsp.im)
+- 資料來源：[DSP](http://ckan.nispc.tw/cs_CZ/dataset)
 
 --- &vcenter .largecontent
 
@@ -832,6 +843,14 @@ install.packages('dplyr', repos = 'http://<ip>/R')
 
 --- &vcenter .largecontent
 
+## dplyr的函數可作用於
+
+- data.frame
+- [data.table](http://cran.r-project.org/web/packages/data.table/index.html)
+- SQL Database(PostgreSQL, MySQL...)
+
+--- &vcenter .largecontent
+
 ## 查詢廠商參與的標案
 
 ```r
@@ -854,8 +873,40 @@ unique(select(filter(tenders, 廠商代碼 == "70794974"), pkAtmMain))
 library(magrittr)
 filter(tenders, 廠商代碼 == "70794974") %>%
   select(pkAtmMain) %>%
+  collect %>%
   unique
 ```
+
+--- &vcenter .largecontent
+
+## dplyr 和SQL Database
+
+```r
+library(dplyr)
+db <- src_postgres(host = "192.168.56.102", user = "vagrant", password = "vagrant")
+tenders <- tbl(db, "tenders")
+x <- filter(tenders, 廠商代碼 == "70794974")
+x$query
+filter(tenders, 廠商代碼 == "70794974") %>%
+  select(pkAtmMain) %>%
+  collect %>%
+  unique
+```
+
+--- &vcenter .largecontent
+
+## dplyr 和SQL Database
+
+- 發生計算的函數
+    - `collect`：將結果傳回R
+    - `compute`：在database建立暫存表格
+    - `collapse`：將query轉乘table expression
+- 做完動作之後執行`collect`將結果傳回R
+- 如果熟悉SQL 的使用者，可以利用`compute`和`collapse`來優化查詢
+
+--- &vcenter .largecontent
+
+## 動動手
 
 - 請建立一個函數，給定統一編號，查出所有該編號有參與的標案
 - 再建立一個函數，給定標案id，查出有參與該標案的統一編號
