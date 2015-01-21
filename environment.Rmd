@@ -95,10 +95,10 @@ sudo ifup eth1
 
 ## Docker 生態系
 
-- 幾乎所有Linux服務，只要一行即可執行
-- 差異化硬碟，充分節省頻寬和硬碟
+- 只要一行指令即可執行許多Linux服務
+- 利用差異化的技術，充分節省頻寬和硬碟
 - 啟動快速，數秒就可開啟新的服務
-- Dockerfile讓人人可充分交流安裝過程
+- Dockerfile讓安裝過程公開透明
 
 --- &vcenter .largecontent
 
@@ -212,7 +212,8 @@ Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 - 資料位置：<http://cran-logs.rstudio.com/>
     - 一個放有<http://cran.rstudio.com/>的線上記錄
 - 我們想要抓取每天的套件下載量作分析
-- 講師已經預先把12月份的資料至於虛擬機器之中，請執行：
+- 部份資料已放置於虛擬機器中
+- 請執行下列程式碼，架設一個虛擬網站：
 
 <pre><code style="font-size:80%">docker run -d --name httpd -v /home/vagrant/www:/usr/local/apache2/htdocs -p 80:80 httpd</code></pre>
 
@@ -223,7 +224,7 @@ Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 - Docker Images的集散地
 - 尋找你需要用到的服務
 - 閱讀Image的使用說明
-- 一行就可以架測試用或內部用的網站
+- 一行指令就可以架設各種服務
 
 --- &vcenter .largecontent #download_script
 
@@ -270,10 +271,6 @@ for(i in seq_along(urls)) {
 - `(`
 - `for`
 
-*** =pnotes
-
-學習如何檢查特殊字元內容的函數
-
 --- &vcenter .largecontent
 
 ## 讀取資料
@@ -315,12 +312,6 @@ pkg_count <- function(date) {
 
 --- &vcenter .largecontent
 
-## 函數、環境和Scoping
-
-- 每一個變數，R 需要找出它真實的意義
-
---- &vcenter .largecontent
-
 ## 當其他人需要分析結果...
 
 - 將`pkg_count`的程式碼丟給下游（Copy & Paste）
@@ -343,15 +334,14 @@ pkg_count <- function(date) {
 
 ## 將`pkg_count`新增至CRANLog專案
 
-- 請跟著講師操作，把`pkg_count.R`加入git 的版本控制
-    - 會需要設定作者資訊
-    - 學習簡單使用rstudio shell
+- 將`pkg_count.R`加入git 版本控制
+- 設定作者資訊
 
 --- &vcenter .largecontent
 
 ## 將CRANLog專案上傳到github
 
-- 請跟著講師操作，註冊github帳號
+- 註冊github帳號
 - 設定ssh 金鑰
 - 建立專案
 - 上傳CRANLog
@@ -386,19 +376,24 @@ dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
 
 ## 上傳public key
 
-- 請跟著講師操作，上傳key 到github
+- 在`github`上開啟帳戶設定
+- 管理金鑰(SSH Keys)
+- 加入金鑰(Add SSH key)
+- 貼上公開金鑰的內容
 
 --- &vcenter .largecontent
 
 ## 建立github專案
 
-- 請跟著講師操作
+- 點選Create New（右上角的`+`）
+- New Repository
+- 設定專案資訊
 
 --- &vcenter .largecontent
 
 ## 設定遠端專案，上傳
 
-- 請跟著講師操作
+- 依照畫面指示複製專案位址
 
 圖片出處：[git-tower](http://www.git-tower.com/learn/ebook/command-line/remote-repositories/introduction)
 
@@ -409,8 +404,7 @@ dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
 ## 下載`pkg_count.R`
 
 - 把自己當成另一個使用者
-- 請跟著講師建立新專案CRANLog2
-    - 來自版本控制
+- 利用Rstudio自git repository建立新專案CRANLog2
 
 --- &vcenter .largecontent
 
@@ -418,18 +412,12 @@ dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
 
 - 備份
 - 版本控制：
-    - 改爛了可以回溯
-    - 兩個人一起改就有衝突解決機制
-    - 被改爛了可以找到兇手
+    - 錯誤可以回溯
+    - 多人共同編修時能解決衝突
+    - 錯誤發生時可以追溯原因
 - 良好的討論空間
 - 自動測試
 - 自動部署
-
---- &vcenter .largecontent
-
-## 私人版的github
-
-- [gitlab](https://about.gitlab.com/)
 
 --- &vcenter .largecontent
 
@@ -447,23 +435,21 @@ dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
 
 --- &vcenter .largecontent
 
-## 建立套件專案CRANLogPkg
+## 建立套件專案CRANLog
 
-- 請跟著講師操作
-    - 建立專案
-    - 刪除部分檔案
-    - 建立檔案`pkg_count.R`
+- 建立專案
+- 刪除部分檔案
+- 建立檔案`pkg_count.R`
 
 --- &vcenter .largecontent
 
 ## 將套件放置至私有套件庫
 
-- 請跟著講師操作
-    - 打包套件
-    - 在終端機將套件複製到`~/www/R/src/contrib`
-        - 切換到`~/www/R/src/contrib`
-        - `docker cp rstudio:/home/vagrant/CRANLog_1.1.tar.gz .`
-    - 在該目錄下更新套件資訊（`PACKAGES`, `PACKAGES.gz`）（卡住）
+- 打包套件
+- 在終端機將套件複製到`~/www/R/src/contrib`
+    - 切換到`~/www/R/src/contrib`
+    - `docker cp rstudio:/home/vagrant/CRANLog_1.1.tar.gz .`
+- 在該目錄下更新套件資訊（`PACKAGES`, `PACKAGES.gz`）（卡住）
 
 *** =pnotes
 
@@ -542,9 +528,7 @@ install.packages("<pkg name>",
 
 - 很多時候，我們會使用代碼來代表某些資料
 - 代碼的意義可能放在某些資料庫之中
-- 在製作報表的時候，<font color="red">常常</font>需要將代碼轉譯回人類可讀的文字
-    - 重複的程式碼
-    - 客製化
+- 在製作報表的時候，需要將代碼轉譯為文字
 - 資料來源：[twcom(g0v)](https://github.com/WeiChengLiou/twcom)
 
 --- &vcenter .largecontent
@@ -628,18 +612,40 @@ id <- "70794974"
 cursor <- mongo.find(mongo, "twcom.cominfo", list(id = id))
 mongo.cursor.next(cursor)
 obj <- mongo.bson.to.list(mongo.cursor.value(cursor))
+mongo.disconnect(mongo)
 obj$name
 ```
 
 --- &vcenter .largecontent
 
-## 建立套件VATQuery
+## 建立套件VATInfo
 
-- 請模仿講者之前的示範，將統編轉換為公司名稱的功能
-    - 函數化
-    - 放入套件VATInfo
+- 請將「將統編轉換為公司名稱」的功能函數化，加入套件中
 - 更新`DESCRIPTION`
     - 加入`Depends: rmongodb`
+
+--- &vcenter .largecontent
+
+## 將統編轉換為公司董監事名單
+
+```r
+library(rmongodb)
+mongo <- mongo.create(<ip>)
+id <- "70794974"
+cursor <- mongo.find(mongo, "twcom.boards", list(id = id))
+retval <- c()
+while(mongo.cursor.next(cursor)) {
+  obj <- mongo.bson.to.list(mongo.cursor.value(cursor))
+  retval <- c(retval, obj$name)
+}
+retval
+```
+
+--- &vcenter .largecontent
+
+## 擴充VATInfo的功能
+
+- 請將「將統編轉換為公司董監事名單」的功能函數化，加入套件中
 
 --- &vcenter .largecontent
 
@@ -654,9 +660,9 @@ obj$name
 
 ## DESCRIPTION
 
-- 各欄位解釋
-- 新增Depends
-- DESCRIPTION和NAMESPACE將在[套件開發](development.html)中再細解
+- 裝載套件的關鍵資訊
+- 目前僅需了解套件名稱和Depends即可
+- 其他內容在[套件開發](development.html)中詳述
 
 --- &vcenter .largecontent
 
@@ -666,18 +672,18 @@ obj$name
 
 - 清楚的描述環境
     - `sessionInfo()`
-- 可重現錯誤的程式碼
-- 禮貌、感謝與尊重
+- 提供可重現錯誤的程式碼
+- 回報錯誤時，注意禮貌，適時表達感謝與尊重
 
 --- &vcenter .largecontent
 
 ## 一般Open Source軟體對於錯誤回報的處理
 
 1. 確認錯誤（看回報的人多不多、開發者能不能重現錯誤）
-1. 尋找原因（開發者的事情了...）
-1. 徵求貢獻者（開發者有時後會懶的做，拋出來徵求貢獻者）
+1. 尋找原因（交給開發者）
+1. 徵求貢獻者（開發者有時會將錯誤留給其他貢獻者，甚至是回報錯誤者）
 1. 測試
-1. 上patch （除非有重大錯誤，否則每個月只能丟CRAN一次）
+1. 上更新 （除非有重大錯誤，否則每個月只能上傳CRAN一次）
 
 --- .dark .segue
 
@@ -701,11 +707,15 @@ docker run -d --name r-postgres -p 5432:5432 r-postgres
 
 ## 安裝RPostgreSQL(需要安裝其他相依模組)
 
-- 解決方式：
-    - google
-    - 包好docker，Dockerfile裏面會詳細註明安裝過程
-
-<https://github.com/docker-library/postgres/blob/51e5166d69320581cb707d6fb102d3ba04803400/9.4/Dockerfile>
+- 安裝時會發生錯誤
+    - 平時只能google錯誤訊息
+    - 歡迎在台灣的R 的討論區交流
+        - [Taiwan R User Group](http://www.meetup.com/Taiwan-R)，mailing list: <Taiwan-useR-Group-list@meetup.com>
+        - ptt R_Language版
+        - [R軟體使用者論壇](https://groups.google.com/forum/#!forum/taiwanruser)
+    - 或是在世界性的R 論壇
+        - [R Mailing List](http://www.r-project.org/mail.html)
+        - [StackOverflow](http://stackoverflow.com/tags/r/info)
 
 --- &vcenter .largecontent
 
@@ -760,7 +770,7 @@ tenders <- dbGetQuery(db, "SELECT * FROM tenders LIMIT 1")
 
 - 位元組(byte)是目前電腦處理記憶體的基本單位。一個位元組有8個位元(bit)。ex: 
     - 00000001, 00111101
-- 我們可以用兩個hex code來代表一個位元組。ex: 
+- 可以用兩個hex code來代表一個位元組。ex: 
     - 00000001 ==> 0000,0001 ==> 0x01
     - 00111101 ==> 0011,1101 ==> 0x3D
 
@@ -772,7 +782,7 @@ tenders <- dbGetQuery(db, "SELECT * FROM tenders LIMIT 1")
 - R 中整數0L的記憶體，寫成hex code是 00 00 00 00 (佔有四個位元組)
 - 數值0.0的記憶體，寫成hex code是 00 00 00 00 00 00 00 00 (佔有八個位元組)
 - 文字"0"的記憶體，寫成hex code是 30 (佔有一個位元組)
-- 「編碼」就是將位元組合變成人類可讀文字的規則。
+- 「編碼」就是將位元組合變成可讀文字的規則。
     - ASCII: 
         - 0x30 => "0", 0x41 => "A", 0x61 => "a"
         - 0x00 => 空字串(NULL)
@@ -789,9 +799,9 @@ tenders <- dbGetQuery(db, "SELECT * FROM tenders LIMIT 1")
 ## 萬國碼
 
 - 最初的ASCII 編碼只定義了大部分的英文字母和數字而已
-- 各國自行擴充編碼，台灣：big-5
+- 各國自行擴充編碼，例如台灣的：big-5，每一個字用兩個位元組表示（Windows預設的繁體中文編碼）
 - 世界統一的編碼，UTF
-    - UTF-8: 每一個「字」可能是1或2個位元組，中間絕對不會有`NULL`
+    - UTF-8（OS X、Linux預設的繁體中文編碼）: 每一個「字」可能是1或2個位元組，中間絕對不會有`NULL`
 
 --- &vcenter .largecontent
 
@@ -897,11 +907,11 @@ filter(tenders, 廠商代碼 == "70794974") %>%
 
 ## dplyr 和SQL Database
 
-- 發生計算的函數
+- 一般指令不做完整的計算(Lazy Evaluation)
+- 在以下指令時，會做完整計算
     - `collect`：將結果傳回R
     - `compute`：在database建立暫存表格
     - `collapse`：將query轉乘table expression
-- 做完動作之後執行`collect`將結果傳回R
 - 如果熟悉SQL 的使用者，可以利用`compute`和`collapse`來優化查詢
 
 --- &vcenter .largecontent
@@ -933,6 +943,7 @@ filter(tenders, 廠商代碼 == "70794974") %>%
         - logical
         - integer
         - character
+    - 可利用`class`查詢物件型態
 - 其餘資料物件都是Atomic type所組合而成
 
 --- &vcenter .largecontent
@@ -1107,24 +1118,9 @@ for(i in 1:5) x[i] <- env[[paste0("a", i)]]
 
 - 已完成
     - 將統編轉換為公司名稱
+    - 給統編，查詢公司的董監事
     - 給統編，查詢有參與的政府標案id
     - 給政府標案id，查詢有參與的公司統編
-- 請再完成「給統編，查詢公司的董監事」
-
-*** =pnotes
-
-```r
-library(rmongodb)
-mongo <- mongo.create(<ip>)
-id <- "70794974"
-cursor <- mongo.find(mongo, "twcom.boards", list(id = id))
-retval <- c()
-while(mongo.cursor.next(cursor)) {
-  obj <- mongo.bson.to.list(mongo.cursor.value(cursor))
-  retval <- c(retval, obj$name)
-}
-retval
-```
 
 --- &vcenter .largecontent
 
