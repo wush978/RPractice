@@ -1,4 +1,4 @@
-all : index.html environment.html
+all : index.html environment.html development.html
 
 %.html : %.Rmd
 	Rscript -e "library(slidify);slidify('$<')"

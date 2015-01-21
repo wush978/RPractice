@@ -28,7 +28,8 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 - 了解DESCRIPTION和NAMESPACE
 - 撰寫套件的文件
 - 測試套件
-- 避免名稱的混亂，學習Imports和Depends的不同
+- 了解環境和函數的關係
+    - 利用Imports取代Depends
 
 --- &vcenter .largecontent
 
@@ -41,3 +42,63 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
     - 細節說明
     - 範例
     - 數學公式
+
+--- &vcenter .largecontent
+
+## VATInfo中的`pkg_count.R`
+
+```
+#'@title Count How Many Times R Packages are Downloaded
+#'@param date A character string. The date to be counted.
+#'@return Table
+#'@details
+#'This is the block of details. \eqn{\alpha + \beta}.
+#'\deqn{\alpha + \beta}
+#'The file is downloaded to the working directory.
+#'@examples
+#'pkg_count("2015-01-01")
+pkg_count <- function(date) {
+# ...
+}
+```
+
+--- &vcenter .largecontent
+
+## 設定roxygen2
+
+- 安裝套件`install.packages("roxygen2", repos="http://<ip>/R")`
+- 重新載入套件
+- 設定建置選項
+    - 設定roxygen2
+
+--- &vcenter .largecontent
+
+## 建置套件
+
+```
+==> roxygen2::roxygenize('.', roclets=c('rd'))
+
+First time using roxygen2 4.0. Upgrading automatically...
+Writing pkg_count.Rd
+Documentation completed
+```
+
+--- &vcenter .largecontent
+
+```r
+?pkg_count
+example(pkg_count)
+```
+
+--- &vcenter .largecontent
+
+## 發佈套件
+
+- Build Source Package
+- Build Binary Package
+
+```
+R CMD build CRANLog
+```
+
+--- &vcenter .largecontent
