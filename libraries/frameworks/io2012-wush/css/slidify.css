@@ -406,7 +406,7 @@ pre > code {
 .title-slide hgroup {
   position:relative; 
   top: 50%; 
-  left: 50%; 
+  left: 10%; 
 }
 
 .title-slide hgroup > h1{
@@ -416,6 +416,8 @@ pre > code {
 .title-slide hgroup > h1, 
 .title-slide hgroup > h2 {
   color: #535E43 ;  /* ; #EF5150 */
+  font-size: 200%;
+}
+.title-slide hgroup > p {
   font-size: 150%;
 }
-
