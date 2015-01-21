@@ -25,11 +25,10 @@ fig <- function(fname, size) sprintf('<img src="assets/img/%s" style="max-width:
 
 ## 學習目標
 
-- 了解DESCRIPTION和NAMESPACE
 - 撰寫套件的文件
 - 測試套件
-- 了解環境和函數的關係
-    - 利用Imports取代Depends
+- NAMESPACE
+- DESCRIPTION
 
 --- &vcenter .largecontent
 
@@ -92,6 +91,12 @@ example(pkg_count)
 
 --- &vcenter .largecontent
 
+## 動動手
+
+- 請幫VATInfo套件撰寫文件
+
+--- &vcenter .largecontent
+
 ## 發佈套件
 
 - Build Source Package
@@ -99,6 +104,104 @@ example(pkg_count)
 
 ```
 R CMD build CRANLog
+R CMD INSTALL --build --preclean CRANLog
 ```
 
 --- &vcenter .largecontent
+
+## 套件檢查
+
+- 調整建置選項
+    - 在`Check Package`之中加入：`--no-manual --no-vignettes --no-build-vignettes`
+- 點選`Build`->`Check Package`或直接在Build視窗中點選`Check`
+
+```
+==> R CMD check --no-manual --no-vignettes --no-build-vignettes CRANLog_1.0.tar.gz
+```
+
+--- &vcenter .largecontent
+
+## 撰寫測試
+
+- 建立資料夾`test`
+- 在`tests`中撰寫R 的測試檔案`test.pkg_count.R`
+
+```r
+library(CRANLog)
+pkg_count("2015-01-01")
+```
+
+--- &vcenter .largecontent
+
+## 建立測試答案
+
+- 調整Rstudio global options
+    - `Tools` -> `Global Options` -> `Packages` -> ...
+    - 取消勾選`Cleanup output after ... R CMD check`
+- 建立`test.pkg_count.R`之後再度執行套件檢查
+    - 複製`<?>/CRANLog.Rcheck/tests/test.pkg_count.Rout`至`<pkg root>/tests/test.pkg_count.Rout.save`
+- 只要未來執行`test.pkg_count.R`的螢幕輸出和`test.pkg_count.Rout.save`不同，測試就會失敗
+
+--- &vcenter .largecontent
+
+## 動動手
+
+- 請幫VATInfo套件撰寫一個測試函數，並建立參考答案
+
+--- &vcenter .largecontent
+
+## NAMESPACE
+
+- NAMESPACE控制套件中的函數是否要曝露(export)給使用者
+- 示例
+    - 將NAMESPACE之中的內容移除後重新安裝
+
+```
+> pkg_count
+Error: object 'pkg_count' not found
+```
+
+--- &vcenter .largecontent
+
+## NAMESPACE
+
+- 曝露所有非`.`開頭的函數
+
+```
+exportPattern("^[[:alpha:]]+")
+```
+
+- 利用`roxygen2`設定曝露的函數
+
+```
+#'@export
+pkg_count <- function(date) {
+```
+
+--- &vcenter .largecontent
+
+## DESCRIPTION
+
+- Package: 套件名稱
+- Version: 版本號
+- Date: 發布日期
+- Title: 一行說明套件目的
+- Author: 套件的作者
+- Maintainer: 負責人 <負責人的email>
+- Depends: R (>= 1.8.0), nlme 隨著此套件載入
+- Imports: 隨著此套件載入但不曝露的套件
+- Suggests: MASS 建議的套件，檢查套件時需要安裝
+- Description: 套件的描述
+- License: GPL (>= 2) 套件的使用權限
+- URL: 套件官網
+- BugReports: 錯誤回報區
+
+--- &vcenter .largecontent
+
+## 動動手
+
+- 請幫VATInfo套件改善它的`DESCRIPTION`
+
+--- &vcenter .largecontent
+
+## Q&A

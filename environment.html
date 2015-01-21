@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>R 軟體套件開發實務應用- 環境設定、語言介紹</title>
+  <meta charset="utf-8">
+  <meta name="description" content="R 軟體套件開發實務應用- 環境設定、語言介紹">
+  <meta name="author" content="Wush Wu">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012-wush/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012-wush/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012-wush/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/zenburn.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/custom.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="libraries/frameworks/io2012-wush/js/jquery-1.7.min.js"></script>
+  <!-- <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> -->
+  <script data-main="libraries/frameworks/io2012-wush/js/slides" 
+    src="libraries/frameworks/io2012-wush/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>R 軟體套件開發實務應用- 環境設定、語言介紹</h1>
+    <h2></h2>
+    <p>Wush Wu<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="largecontent" id="slide-1" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>學習目標</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>Linux 上的命令列環境</li>
+<li>如何利用docker快速架設可用的Rstudio Server、http server、各種database</li>
+<li>Rstudio Server界面、專案管理、版本控制管理</li>
+<li>版本控制入門(git)</li>
+<li>解決數種實務上讀取資料的問題</li>
+<li>將功能整合至套件之中</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-2" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>今日環境介紹</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>Virtual Box架設的虛擬機器
+
+<ul>
+<li>Ubuntu 14.04 from <a href="https://www.vagrantup.com/">Vagrant</a></li>
+<li>已經先行架設好Docker以及數個客製化docker images</li>
+<li>預設ip為<code>192.168.0.50</code>
+
+<ul>
+<li>如本機端無法連線至<code>192.168.0.50</code>，請將ip更改為dhcp(按p看指令)</li>
+</ul></li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+<aside class="note">
+  <section>
+    <h3>手動方法</h3>
+
+<p>利用指令<code>sudo nano /etc/network/interfaces</code>打開設定檔案並將<code>static</code>置換為<code>dhcp</code>後存檔</p>
+
+<h3>打字</h3>
+
+<pre><code>sed &quot;s/static/dhcp/&quot; &lt; /etc/network/interfaces &gt; /tmp/interfaces
+sudo mv /tmp/interfaces /etc/network/interfaces
+</code></pre>
+
+<h3>重新啟動網路</h3>
+
+<pre><code>sudo ifdown eth1
+sudo ifup eth1
+</code></pre>
+
+  </section>
+</aside>
+</slide>
+<slide class="largecontent" id="slide-3" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>命令列</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>虛擬機器的GUI</li>
+<li>各種ssh client，如: pietty(windows)、openssh(OS X, ubuntu)</li>
+<li>講者先準備的web-based ssh client，請用瀏覽器打開<code>https://&lt;vm ip&gt;:4200</code></li>
+<li>Rstudio Server shell（但是需先開啟Rstudio Server）</li>
+<li>位置：<code>192.168.0.50</code>，帳號密碼：<code>vagrant/vagrant</code>
+
+<ul>
+<li>如果替換成<code>dhcp</code>，請利用<code>ifconfig eth1</code>來查看ip</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-4" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>啟動Rstudio Server</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>請在命令列輸入：</li>
+</ul>
+
+<pre><code style="font-size:80%">docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rstudio-build</code></pre>
+
+<ul>
+<li>需等待Rstudio Server開啟，趁機學Docker</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-5" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>2014年IT界最受矚目的專案：docker</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>Docker 是一種Virtual Container的技術，一種類似Virtual Machine的技術</li>
+</ul>
+
+<p><img src="assets/img/container_vs_vm.jpg" class="fit100" /></p>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-6" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Docker 生態系</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>只要一行指令即可執行許多Linux服務</li>
+<li>利用差異化的技術，充分節省頻寬和硬碟</li>
+<li>啟動快速，數秒就可開啟新的服務</li>
+<li>Dockerfile讓安裝過程公開透明</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-7" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R and Docker</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li><a href="https://github.com/rocker-org/rocker">rocker</a></li>
+<li>今天的Rstudio Server改自<a href="https://registry.hub.docker.com/u/rocker/rstudio/">rocker/rstudio</a></li>
+<li>Dockerfile</li>
+</ul>
+
+<pre><code>...
+## User config and supervisord for persistant RStudio session
+COPY userconf.sh /usr/bin/userconf.sh
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN mkdir -p /var/log/supervisor \
+  &amp;&amp; chgrp staff /var/log/supervisor \
+  &amp;&amp; chmod g+w /var/log/supervisor \
+  &amp;&amp; chgrp staff /etc/supervisor/conf.d/supervisord.conf
+EXPOSE 8787
+...
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-8" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Container And Image</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<h3>Docker中的...</h3>
+
+<ul>
+<li>image</li>
+<li>container</li>
+</ul>
+
+<h3>如同現實中的...</h3>
+
+<ul>
+<li>Win7 安裝光碟</li>
+<li>一台Win7作業系統的電腦</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-9" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Docker 指令詳解：<code>docker</code>總覽</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code>Usage: docker [OPTIONS] COMMAND [arg...]
+    cp        Copy files/folders from a container&#39;s filesystem to the host path
+    exec      Run a command in an existing container
+    images    List images
+    rm        Remove one or more containers
+    rmi       Remove one or more images
+    run       Run a command in a new container
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-10" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Docker 指令詳解：<code>docker run</code>總覽</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code style="font-size:80%">
+docker run -d --name rstudio -e USER=vagrant -e PASSWORD=vagrant -p 8787:8787 rstudio-build
+
+Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+-e, --env=[]               Set environment variables
+-i, --interactive=false    Keep STDIN open even if not attached
+-t, --tty=false            Allocate a pseudo-TTY
+-v, --volume=[]            Bind mount a volume (e.g., from the host: -v /host:
+-p, --publish=[]           Publish a container's port to the host
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-11" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>登入Rstudio</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>在支援的瀏覽器輸入：<code>&lt;ip&gt;:8787</code>
+
+<ul>
+<li>帳號為：<code>vagrant</code></li>
+<li>密碼為：<code>vagrant</code></li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-12" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>Rstudio 界面解說</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><center></p>
+
+<ul>
+<li>工作區的功能解說</li>
+</ul>
+
+<p><img src="assets/img/rstudioserver.jpg" class="fit100" />
+</center></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-13" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>說明<code>建立新專案</code>(0.98.1091)</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>Create Project From
+
+<ul>
+<li>New Directory</li>
+<li>Existed Directory</li>
+<li>Version Control</li>
+</ul></li>
+<li>Project Type
+
+<ul>
+<li>Empty Project</li>
+<li>R Packages</li>
+<li>Shiny Apps</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-14" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>動動手</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>請建立一個一般的新專案，名稱為：CRANLog
+
+<ul>
+<li>記得啟用git</li>
+</ul></li>
+</ul>
+
+<h1 class="big">我們來建立一個抓取資料的套件</h1>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-15" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>目標簡介</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>資料位置：<a href="http://cran-logs.rstudio.com/">http://cran-logs.rstudio.com/</a>
+
+<ul>
+<li>一個放有<a href="http://cran.rstudio.com/">http://cran.rstudio.com/</a>的線上記錄</li>
+</ul></li>
+<li>我們想要抓取每天的套件下載量作分析</li>
+<li>部份資料已放置於虛擬機器中</li>
+<li>請執行下列程式碼，架設一個虛擬網站：</li>
+</ul>
+
+<pre><code style="font-size:80%">docker run -d --name httpd -v /home/vagrant/www:/usr/local/apache2/htdocs -p 80:80 httpd</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-16" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2><a href="https://hub.docker.com">Docker Hub</a></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>Docker Images的集散地</li>
+<li>尋找你需要用到的服務</li>
+<li>閱讀Image的使用說明</li>
+<li>一行指令就可以架設各種服務</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="download_script" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>範例下載script</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<p>（修改自<a href="http://cran-logs.rstudio.com/">http://cran-logs.rstudio.com/</a>上的範例）</p>
+
+<pre><code class="r"># 開始日期
+start &lt;- as.Date(&#39;2015-01-01&#39;)
+# 結束日期
+end &lt;- as.Date(&#39;2015-01-02&#39;)
+# 展開所有日期
+all_days &lt;- seq(start, end, by = &#39;day&#39;)
+# 扣掉已經下載的連結
+missing_days &lt;- setdiff(all_days, tools::file_path_sans_ext(dir(), TRUE))
+class(missing_days) &lt;- &quot;Date&quot;
+# 拼湊出下載連結
+year &lt;- as.POSIXlt(all_days)$year + 1900
+urls &lt;- paste0(&#39;http://&lt;ip&gt;/cran-log/&#39;, year, &#39;/&#39;, missing_days, &#39;.csv.gz&#39;)
+# 可以使用download.file來做下載
+for(i in seq_along(urls)) {
+  download.file(urls[i], destfile = sprintf(&quot;%s.csv.gz&quot;, missing_days[i]))
+}
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-18" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R是一個以函數為主體的語言</h2>
+</hgroup>
+<div class = 'flexbox vcenter'>
+<div style='float:left;width:48%;' class='centered'>
+  <h3>看得到的</h3>
+
+<ul>
+<li><code>as.Date</code></li>
+<li><code>seq</code></li>
+<li><code>setdiff</code></li>
+</ul>
+
+</div>
+<div style='float:right;width:48%;' class='centered'>
+  <h3>容易忽略的</h3>
+
+<ul>
+<li><code>&lt;-</code></li>
+<li><code>(</code></li>
+<li><code>for</code></li>
+</ul>
+
+</div>
+</div>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-19" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>讀取資料</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<p>續下載資料的程式</p>
+
+<pre><code class="r">data &lt;- read.table(&quot;2015-01-01.csv.gz&quot;, header = TRUE, sep = &quot;,&quot;)
+head(sort(table(data$package), decreasing = TRUE))
+</code></pre>
+
+<pre><code>##     digest        DBI       plyr manipulate       Rcpp    ggplot2 
+##      1009        973        896        877        867        817 
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-20" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>一個可能的實際情況...</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ol>
+<li>資料來自於某個資料源: <code>download.file</code></li>
+<li>每天都要自該資料源更新資料: <code>missing_days &lt;- ...</code></li>
+<li>使用既定程序分析出結果: <code>table</code></li>
+<li>輸出結果: <code>print</code></li>
+</ol>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-21" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>把1 ~ 4包成一個函數</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">pkg_count &lt;- function(date) {
+  year &lt;- as.POSIXlt(date)$year + 1900
+  urls &lt;- paste0(&#39;http://&lt;ip&gt;/cran-log/&#39;, year, &#39;/&#39;, date, &#39;.csv.gz&#39;)
+  download.file(urls, destfile = sprintf(&quot;%s.csv.gz&quot;, date))
+  data &lt;- read.table(sprintf(&quot;%s.csv.gz&quot;, date), header = TRUE, sep = &quot;,&quot;)
+  sort(table(data$package), decreasing = TRUE)
+}
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-22" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>當其他人需要分析結果...</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>將<code>pkg_count</code>的程式碼丟給下游（Copy &amp; Paste）</li>
+<li>將<code>pkg_count</code>存成<code>pkg_count.R</code>，丟給下游（<code>source</code>）</li>
+<li>將<code>pkg_count</code>包成套件，上傳到套件庫供下游下載</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-23" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>利用git 來傳送<code>pkg_count.R</code></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li><a href="http://git-scm.com/">git</a> 提供了許多強大功能
+
+<ul>
+<li>高效能的傳送檔案</li>
+<li>版本控制</li>
+</ul></li>
+<li><a href="https://github.com">github</a> 以git 為底的程式碼社交平台
+
+<ul>
+<li>優化程式相關的討論環境</li>
+<li>已經和許多線上服務整合</li>
+</ul></li>
+<li><a href="https://about.gitlab.com/">gitlab</a> 私有版本的github</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-24" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>將<code>pkg_count</code>新增至CRANLog專案</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>將<code>pkg_count.R</code>加入git 版本控制</li>
+<li>設定作者資訊</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-25" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>將CRANLog專案上傳到github</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>註冊github帳號</li>
+<li>設定ssh 金鑰</li>
+<li>建立專案</li>
+<li>上傳CRANLog</li>
+<li>測試下載CRANLog</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-26" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>了解ssh key</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>ssh實做了RSA 、DSA 和ECDSA 等非對稱加解密演算法
+
+<ul>
+<li>密碼是兩個檔案：<code>id_rsa</code>(private)和<code>id_rsa.pub</code>(public)</li>
+<li>特色：用public加密的資料，只能用private解密。反之亦然。</li>
+<li>廣泛的被運用於各種網頁應用之中，如https。</li>
+<li>github、AWS 等網站運用這種技術來做自動認證</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-27" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>建立ssh key:<code>ssh-keygen</code></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code>Generating public/private rsa key pair.
+Enter file in which to save the key (/home/vagrant/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/vagrant/.ssh/id_rsa.
+Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub.
+The key fingerprint is:
+dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-28" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>上傳public key</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>在<code>github</code>上開啟帳戶設定</li>
+<li>管理金鑰(SSH Keys)</li>
+<li>加入金鑰(Add SSH key)</li>
+<li>貼上公開金鑰的內容</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-29" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>建立github專案</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>點選Create New（右上角的<code>+</code>）</li>
+<li>New Repository</li>
+<li>設定專案資訊</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-30" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>設定遠端專案，上傳</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>依照畫面指示複製專案位址</li>
+</ul>
+
+<p>圖片出處：<a href="http://www.git-tower.com/learn/ebook/command-line/remote-repositories/introduction">git-tower</a></p>
+
+<p><center><img src="assets/img/basic-remote-workflow.png" class="fit50" /></center></p>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-31" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>下載<code>pkg_count.R</code></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>把自己當成另一個使用者</li>
+<li>利用Rstudio自git repository建立新專案CRANLog2</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-32" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>運用<code>git</code>和<code>github</code>的好處</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>備份</li>
+<li>版本控制：
+
+<ul>
+<li>錯誤可以回溯</li>
+<li>多人共同編修時能解決衝突</li>
+<li>錯誤發生時可以追溯原因</li>
+</ul></li>
+<li>良好的討論空間</li>
+<li>自動測試</li>
+<li>自動部署</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-33" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>建立<code>pkg_count</code>的說明文件</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>README.md</li>
+</ul>
+
+<pre><code class="md">這個程式是用來統計R 的套件在CRAN上的下載次數
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="segue dark" id="slide-34" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>套件化</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-35" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>建立套件專案CRANLog</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>建立專案</li>
+<li>刪除部分檔案</li>
+<li>建立檔案<code>pkg_count.R</code></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-36" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>將套件放置至私有套件庫</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>打包套件</li>
+<li>在終端機將套件複製到<code>~/www/R/src/contrib</code>
+
+<ul>
+<li>切換到<code>~/www/R/src/contrib</code></li>
+<li><code>docker cp rstudio:/home/vagrant/CRANLog_1.1.tar.gz .</code></li>
+</ul></li>
+<li>在該目錄下更新套件資訊（<code>PACKAGES</code>, <code>PACKAGES.gz</code>）（卡住）</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+<aside class="note">
+  <section>
+    <p>複習docker的<code>-v</code></p>
+
+  </section>
+</aside>
+</slide>
+<slide class="largecontent" id="slide-37" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>利用Docker更新套件資訊</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>shell</li>
+</ul>
+
+<pre><code class="sh">cd /home/vagrant/www/R/src/contrib
+docker run -v `pwd`:/src -w /src -it --rm rstudio-build R
+</code></pre>
+
+<ul>
+<li>R</li>
+</ul>
+
+<pre><code class="r">tools::write_PACKAGES(&quot;.&quot;)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+<aside class="note">
+  <section>
+    <p>工作目錄的概念</p>
+
+  </section>
+</aside>
+</slide>
+<slide class="largecontent" id="slide-38" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Rscript</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code>Usage: /path/to/Rscript [--options] [-e expr [-e expr2 ...] | file] [args]
+
+--options accepted are
+  --help              Print usage and exit
+  --version           Print version and exit
+  --verbose           Print information on progress
+  --default-packages=list
+                      Where &#39;list&#39; is a comma-separated set
+                        of package names, or &#39;NULL&#39;
+or options to R, in addition to --slave --no-restore, such as
+  --save              Do save workspace at the end of the session
+  --no-environ        Don&#39;t read the site and user environment files
+  --no-site-file      Don&#39;t read the site-wide Rprofile
+  --no-init-file      Don&#39;t read the user R profile
+  --restore           Do restore previously saved objects at startup
+  --vanilla           Combine --no-save, --no-restore, --no-site-file
+                        --no-init-file and --no-environ
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-39" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>將Rscript和docker run結合</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code>cd /home/vagrant/www/R/src/contrib
+docker run -v `pwd`:/src -w /src -it --rm rstudio-build \
+  Rscript -e &quot;tools::write_PACKAGES(&#39;.&#39;)&quot;
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-40" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>直接從套件庫安裝</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>可能需要重新啟動R</li>
+</ul>
+
+<pre><code class="r">install.packages(&quot;&lt;pkg name&gt;&quot;, 
+  repos = &quot;http://&lt;ip&gt;/R&quot;,
+  type = &quot;source&quot;)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-41" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>統一編號查詢(mongodb)</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>很多時候，我們會使用代碼來代表某些資料</li>
+<li>代碼的意義可能放在某些資料庫之中</li>
+<li>在製作報表的時候，需要將代碼轉譯為文字</li>
+<li>資料來源：<a href="https://github.com/WeiChengLiou/twcom">twcom(g0v)</a></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-42" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>啟動mongodb</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="sh">docker run -d --name mongo -p 27017:27017 r-mongo
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-43" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>安裝套件<code>rmongodb</code></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r"># http proxy
+Sys.setenv(http_proxy=&quot;&lt;proxy location&gt;&quot;)
+install.packages(&quot;rmongodb&quot;)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-44" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>查詢mongodb的必備知識</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li><code>mongo.create</code></li>
+<li><code>mongo.find</code></li>
+<li>cursor related
+
+<ul>
+<li><code>mongo.cursor.next</code></li>
+<li><code>mongo.cursor.value</code></li>
+</ul></li>
+<li>bson related
+
+<ul>
+<li><code>mongo.bson.to.list</code></li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-45" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2><code>mongo.create</code></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">?mongo.create
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-46" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2><code>mongo.find</code>和cursor</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>Iterator(迭代器)</li>
+<li>取值</li>
+<li>有沒有下一個</li>
+</ul>
+
+<pre><code>ooo... ==next==&gt; ooo...
+^                 ^
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-47" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 中有沒有辦法使用類似迭代器的概念?</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li><code>readLines</code> + connection
+
+<ul>
+<li>讀一行資料做處理</li>
+<li>處理完畢之後再讀下一行資料</li>
+<li>讀到沒資料或connection被關閉為止</li>
+</ul></li>
+<li>利用bash pipeline <code>|</code>來作類似的效果</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-48" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>rmongodb的cursor</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code>ooo... ==`mongo.cursor.next`==&gt; ooo...
+^                                ^
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-49" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>將統編轉換為公司名稱</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">library(rmongodb)
+mongo &lt;- mongo.create(&lt;ip&gt;)
+id &lt;- &quot;70794974&quot;
+cursor &lt;- mongo.find(mongo, &quot;twcom.cominfo&quot;, list(id = id))
+mongo.cursor.next(cursor)
+obj &lt;- mongo.bson.to.list(mongo.cursor.value(cursor))
+mongo.disconnect(mongo)
+obj$name
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-50" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>建立套件VATInfo</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>請將「將統編轉換為公司名稱」的功能函數化，加入套件中</li>
+<li>更新<code>DESCRIPTION</code>
+
+<ul>
+<li>加入<code>Depends: rmongodb</code></li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-51" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>將統編轉換為公司董監事名單</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">library(rmongodb)
+mongo &lt;- mongo.create(&lt;ip&gt;)
+id &lt;- &quot;70794974&quot;
+cursor &lt;- mongo.find(mongo, &quot;twcom.boards&quot;, list(id = id))
+retval &lt;- c()
+while(mongo.cursor.next(cursor)) {
+  obj &lt;- mongo.bson.to.list(mongo.cursor.value(cursor))
+  retval &lt;- c(retval, obj$name)
+}
+retval
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-52" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>擴充VATInfo的功能</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>請將「將統編轉換為公司董監事名單」的功能函數化，加入套件中</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-53" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 套件和git</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>加入：
+
+<ul>
+<li>R/</li>
+<li>DESCRIPTION</li>
+<li>NAMESPACE</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-54" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>DESCRIPTION</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>裝載套件的關鍵資訊</li>
+<li>目前僅需了解套件名稱和Depends即可</li>
+<li>其他內容在<a href="development.html">套件開發</a>中詳述</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-55" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>經驗分享：如何回報bug</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<p><a href="https://github.com/mongosoup/rmongodb/issues/20">https://github.com/mongosoup/rmongodb/issues/20</a></p>
+
+<ul>
+<li>清楚的描述環境
+
+<ul>
+<li><code>sessionInfo()</code></li>
+</ul></li>
+<li>提供可重現錯誤的程式碼</li>
+<li>回報錯誤時，注意禮貌，適時表達感謝與尊重</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-56" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>一般Open Source軟體對於錯誤回報的處理</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ol>
+<li>確認錯誤（看回報的人多不多、開發者能不能重現錯誤）</li>
+<li>尋找原因（交給開發者）</li>
+<li>徵求貢獻者（開發者有時會將錯誤留給其他貢獻者，甚至是回報錯誤者）</li>
+<li>測試</li>
+<li>上更新 （除非有重大錯誤，否則每個月只能上傳CRAN一次）</li>
+</ol>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="dark segue" id="slide-57" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>SQL Database</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-58" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>政府標案資料</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>資料來源：<a href="http://ckan.nispc.tw/cs_CZ/dataset">DSP</a></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-59" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>啟動PostgreSQL</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="sh">docker run -d --name r-postgres -p 5432:5432 r-postgres
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-60" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>安裝RPostgreSQL(需要安裝其他相依模組)</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>安裝時會發生錯誤
+
+<ul>
+<li>平時只能google錯誤訊息</li>
+<li>歡迎在台灣的R 的討論區交流
+
+<ul>
+<li><a href="http://www.meetup.com/Taiwan-R">Taiwan R User Group</a>，mailing list: <a href="mailto:Taiwan-useR-Group-list@meetup.com">Taiwan-useR-Group-list@meetup.com</a></li>
+<li>ptt R_Language版</li>
+<li><a href="https://groups.google.com/forum/#!forum/taiwanruser">R軟體使用者論壇</a></li>
+</ul></li>
+<li>或是在世界性的R 論壇
+
+<ul>
+<li><a href="http://www.r-project.org/mail.html">R Mailing List</a></li>
+<li><a href="http://stackoverflow.com/tags/r/info">StackOverflow</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-61" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>利用Docker exec進入container</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>安裝libpq-dev</li>
+</ul>
+
+<pre><code class="sh">docker ps # 列出現在正在跑的Docker Containers
+docker exec -it rstudio /bin/bash # 在Docker Containers之中執行指令
+apt-get update
+apt-get install libpq-dev # then y
+</code></pre>
+
+<ul>
+<li>如果<code>apt-get libpq-dev</code>出現錯誤，請再<code>apt-get update</code>一次試試看</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-62" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>連結資料庫</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">install.packages(&#39;RPostgreSQL&#39;, repos = &#39;http://&lt;ip&gt;/R&#39;)
+library(RPostgreSQL)
+db &lt;- dbConnect(dbDriver(&quot;PostgreSQL&quot;), host = &quot;&lt;ip&gt;&quot;, 
+                user = &quot;vagrant&quot;, password = &quot;vagrant&quot;)
+dbListTables(db)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-63" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2><code>dbReadTable</code></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">tenders &lt;- dbReadTable(db, &quot;tenders&quot;)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-64" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>SQL Command</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">tenders &lt;- dbGetQuery(db, &quot;SELECT * FROM tenders LIMIT 1&quot;)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="segue dark" id="slide-65" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>常見問題：中文編碼</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-66" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>編碼知多少</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>位元組(byte)是目前電腦處理記憶體的基本單位。一個位元組有8個位元(bit)。ex: 
+
+<ul>
+<li>00000001, 00111101</li>
+</ul></li>
+<li>可以用兩個hex code來代表一個位元組。ex: 
+
+<ul>
+<li>00000001 ==&gt; 0000,0001 ==&gt; 0x01</li>
+<li>00111101 ==&gt; 0011,1101 ==&gt; 0x3D</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-67" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>編碼知多少</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>文字的&quot;0&quot;和數字的0，在電腦中是不同的！</li>
+<li>R 中整數0L的記憶體，寫成hex code是 00 00 00 00 (佔有四個位元組)</li>
+<li>數值0.0的記憶體，寫成hex code是 00 00 00 00 00 00 00 00 (佔有八個位元組)</li>
+<li>文字&quot;0&quot;的記憶體，寫成hex code是 30 (佔有一個位元組)</li>
+<li>「編碼」就是將位元組合變成可讀文字的規則。
+
+<ul>
+<li>ASCII: 
+
+<ul>
+<li>0x30 =&gt; &quot;0&quot;, 0x41 =&gt; &quot;A&quot;, 0x61 =&gt; &quot;a&quot;</li>
+<li>0x00 =&gt; 空字串(NULL)</li>
+</ul></li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-68" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 如何處理文字<code>character</code>？</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>一段文字，就是一塊連續的「位元組」，直到遇到0x00為止</li>
+<li>包含0x00的連續位元組，在R 中請使用<code>RawVector</code>來處理</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-69" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>萬國碼</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>最初的ASCII 編碼只定義了大部分的英文字母和數字而已</li>
+<li>各國自行擴充編碼，例如台灣的：big-5，每一個字用兩個位元組表示（Windows預設的繁體中文編碼）</li>
+<li>世界統一的編碼，UTF
+
+<ul>
+<li>UTF-8（OS X、Linux預設的繁體中文編碼）: 每一個「字」可能是1或2個位元組，中間絕對不會有<code>NULL</code></li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-70" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 的編碼錯誤訊息</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code>## Error: 無效的多位元組字串於
+## &#39;&lt;bb&gt;O&lt;a5&gt;_&lt;a5&gt;&lt;ab&gt;&lt;ac&gt;F&lt;a9&gt;&lt;b2&gt;ĵ&lt;b9&gt;&lt;c1&gt;`&lt;a7&gt;&lt;bd&gt;&#39;
+</code></pre>
+
+<pre><code>## Error: 
+## line 1 appears to contain embedded nulls
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-71" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>SQL資料庫中解決編碼問題</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="sql">SET NAMES &#39;UTf-8&#39;;
+SET NAMES &#39;BIG5&#39;;
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-72" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>試著讀取BIG5 看看亂碼</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">dbGetQuery(db, &quot;SET NAMES &#39;BIG5&#39;;&quot;)
+dbGetQuery(db, &quot;SELECT * FROM tenders LIMIT 1;&quot;)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-73" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>dplyr 整理資料的好幫手</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">install.packages(&#39;dplyr&#39;, repos = &#39;http://&lt;ip&gt;/R&#39;)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-74" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>dplyr 的常用函數</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<p><center><img src="assets/img/R_ETL_Fn1.png" class="fit100" /></center></p>
+
+<p>取自<a href="https://ntuaha.github.io/R_ETL_LAB">資料科學愛好者年會 ETL課程</a></p>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-75" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>dplyr的函數可作用於</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>data.frame</li>
+<li><a href="http://cran.r-project.org/web/packages/data.table/index.html">data.table</a></li>
+<li>SQL Database(PostgreSQL, MySQL...)</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-76" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>查詢廠商參與的標案</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">colnames(tenders)
+# 查詢統一編號70794974所參與的標案，這裡的「統一編號」即「廠商代碼」
+filter(tenders, 廠商代碼 == &quot;70794974&quot;)
+# 取得標案的id
+select(filter(tenders, 廠商代碼 == &quot;70794974&quot;), pkAtmMain)
+# 去除重複的標案id
+unique(select(filter(tenders, 廠商代碼 == &quot;70794974&quot;), pkAtmMain))
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-77" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>%&gt;%, <a href="http://cran.r-project.org/web/packages/magrittr/index.html">magrittr</a></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r"># 去除重複的標案id
+unique(select(filter(tenders, 廠商代碼 == &quot;70794974&quot;), pkAtmMain))
+library(magrittr)
+filter(tenders, 廠商代碼 == &quot;70794974&quot;) %&gt;%
+  select(pkAtmMain) %&gt;%
+  collect %&gt;%
+  unique
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-78" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>dplyr 和SQL Database</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">library(dplyr)
+db &lt;- src_postgres(host = &quot;192.168.56.102&quot;, user = &quot;vagrant&quot;, password = &quot;vagrant&quot;)
+tenders &lt;- tbl(db, &quot;tenders&quot;)
+x &lt;- filter(tenders, 廠商代碼 == &quot;70794974&quot;)
+x$query
+filter(tenders, 廠商代碼 == &quot;70794974&quot;) %&gt;%
+  select(pkAtmMain) %&gt;%
+  collect %&gt;%
+  unique
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-79" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>dplyr 和SQL Database</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>一般指令不做完整的計算(Lazy Evaluation)</li>
+<li>在以下指令時，會做完整計算
+
+<ul>
+<li><code>collect</code>：將結果傳回R</li>
+<li><code>compute</code>：在database建立暫存表格</li>
+<li><code>collapse</code>：將query轉乘table expression</li>
+</ul></li>
+<li>如果熟悉SQL 的使用者，可以利用<code>compute</code>和<code>collapse</code>來優化查詢</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-80" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>動動手</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>請建立一個函數，給定統一編號，查出所有該編號有參與的標案</li>
+<li>再建立一個函數，給定標案id，查出有參與該標案的統一編號</li>
+<li>將這兩個函數加入套件VATInfo之中</li>
+<li>VATInfo套件的Depends需加入RPostgreSQL和dplyr</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-81" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>型態問題</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>這裡的「統一編號」或「廠商代碼」是數字還是字串？</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="dark segue" id="slide-82" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>R 的資料型態</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-83" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 資料的Atomic Type</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>Atomic type都是向量
+
+<ul>
+<li>常見的資料型態
+
+<ul>
+<li>numeric</li>
+<li>logical</li>
+<li>integer</li>
+<li>character</li>
+</ul></li>
+<li>可利用<code>class</code>查詢物件型態</li>
+</ul></li>
+<li>其餘資料物件都是Atomic type所組合而成</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-84" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 中組合成高階物件的方式</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>list, data.frame, environment</li>
+<li>attributes</li>
+<li>S4</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-85" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>list, data.frame</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li><code>iris</code></li>
+</ul>
+
+<pre><code class="r">str(iris)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    150 obs. of  5 variables:
+##  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+##  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+##  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+##  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+##  $ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-86" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>attributes</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li><code>matrix</code>, <code>factor</code></li>
+</ul>
+
+<pre><code>attributes(iris$Species)
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-87" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>An example of list + attributes: S3</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">g &lt;- lm(dist ~ speed, cars)
+str(head(g))
+</code></pre>
+
+<pre><code>## List of 6
+##  $ coefficients : Named num [1:2] -17.58 3.93
+##   ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;(Intercept)&quot; &quot;speed&quot;
+##  $ residuals    : Named num [1:50] 3.85 11.85 -5.95 12.05 2.12 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:50] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ effects      : Named num [1:50] -303.914 145.552 -8.115 9.885 0.194 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:50] &quot;(Intercept)&quot; &quot;speed&quot; &quot;&quot; &quot;&quot; ...
+##  $ rank         : int 2
+##  $ fitted.values: Named num [1:50] -1.85 -1.85 9.95 9.95 13.88 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:50] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ assign       : int [1:2] 0 1
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-88" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>S4</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li><code>dgCMatrix</code></li>
+</ul>
+
+<pre><code class="r">library(Matrix)
+(m &lt;- Matrix(c(0,0,2:0), 3,5))
+</code></pre>
+
+<pre><code>## 3 x 5 sparse Matrix of class &quot;dgCMatrix&quot;
+##               
+## [1,] . 1 . . 2
+## [2,] . . 2 . 1
+## [3,] 2 . 1 . .
+</code></pre>
+
+<pre><code class="r">str(m)
+</code></pre>
+
+<pre><code>## Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
+##   ..@ i       : int [1:6] 2 0 1 2 0 1
+##   ..@ p       : int [1:6] 0 1 2 4 4 6
+##   ..@ Dim     : int [1:2] 3 5
+##   ..@ Dimnames:List of 2
+##   .. ..$ : NULL
+##   .. ..$ : NULL
+##   ..@ x       : num [1:6] 2 1 2 1 2 1
+##   ..@ factors : list()
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-89" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>輸出的型態</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>在一個弱型態語言中，告知使用者輸出的型態能帶給後續使用者很大的方便</li>
+<li>建立函數時，如果能確定型態，對於後續的處理會更方便
+
+<ul>
+<li>範例：統一編號
+-<code>is.xxx</code>, xxx為型態名稱</li>
+</ul></li>
+<li>檢查TRUE/FALSE時，建議用<code>isTRUE</code></li>
+</ul>
+
+<pre><code class="r">if (NA) print(&quot;true&quot;) else print(&quot;false&quot;)
+</code></pre>
+
+<pre><code>## Error: missing value where TRUE/FALSE needed
+</code></pre>
+
+<pre><code class="r">if (isTRUE(NA)) print(&quot;true&quot;) else print(&quot;false&quot;)
+</code></pre>
+
+<pre><code>## [1] &quot;false&quot;
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-90" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>輸出的型態範例：矩陣</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">m &lt;- matrix(1:4, 2, 2)
+m[,1]
+</code></pre>
+
+<pre><code>## [1] 1 2
+</code></pre>
+
+<pre><code class="r">m[,1,drop=FALSE]
+</code></pre>
+
+<pre><code>##      [,1]
+## [1,]    1
+## [2,]    2
+</code></pre>
+
+<pre><code class="r"># ?`[`
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="dark segue" id="slide-91" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>list 和 environment</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-92" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>常見的問題</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code class="r">a1 &lt;- 1
+a2 &lt;- 2
+a3 &lt;- 3
+a4 &lt;- 4
+a5 &lt;- 5
+df &lt;- data.frame(a = c(a1, a2, a3, a4, a5))
+</code></pre>
+
+<ul>
+<li>能不能用迴圈來寫<code>c(a1, a2, a3, a4, a5)</code>？</li>
+<li>利用<code>1:5</code>建立字串<code>c(&quot;a1&quot;, &quot;a2&quot;, &quot;a3&quot;, &quot;a4&quot;, &quot;a5&quot;)</code>
+
+<ul>
+<li><code>paste(&quot;a&quot;, 1:5, sep=&quot;&quot;)</code>、<code>paste0(&quot;a&quot;, 1:5)</code></li>
+<li><code>sprintf(&quot;a%d&quot;, 1:5)</code></li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-93" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>List</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>Atomic Type是某種資料的向量</li>
+<li><code>list</code>是「R 物件」的向量</li>
+<li><code>list</code>中的物件可以建立「姓名」（key）</li>
+</ul>
+
+<pre><code class="r">x &lt;- list()
+for(i in 1:5) x[[paste0(&quot;a&quot;, i)]] &lt;- i
+df &lt;- data.frame(a = unlist(x))
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-94" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2><code>[</code>和<code>[[</code></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>相同點
+
+<ul>
+<li>兩者都可以接名稱或整數
+
+<ul>
+<li><code>x[key];x[[key]]</code></li>
+<li><code>x[i];x[[i]]</code></li>
+</ul></li>
+</ul></li>
+<li>相異點
+
+<ul>
+<li><code>[</code>會維持型態</li>
+<li><code>[[</code>會改變型態</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-95" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Environment</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>如果已經有了<code>a1</code>到<code>a5</code>的物件了呢...</li>
+</ul>
+
+<pre><code class="r">a1 &lt;- 1
+a2 &lt;- 2
+a3 &lt;- 3
+a4 &lt;- 4
+a5 &lt;- 5
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-96" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Environment管理變數和物件之間的關係</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code>a1 --&gt; 1
+a2 --&gt; 2
+...
+a5 --&gt; 5
+</code></pre>
+
+<ul>
+<li>字串==&gt;物件</li>
+<li>類似<code>list</code></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-97" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2><code>globalenv()</code></h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<pre><code>env &lt;- environment() #globalenv()
+env[[&quot;a1&quot;]]
+x &lt;- c()
+for(i in 1:5) x[i] &lt;- env[[paste0(&quot;a&quot;, i)]]
+</code></pre>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="segue dark" id="slide-98" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>練習專案</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-99" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>VATInfo</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>已完成
+
+<ul>
+<li>將統編轉換為公司名稱</li>
+<li>給統編，查詢公司的董監事</li>
+<li>給統編，查詢有參與的政府標案id</li>
+<li>給政府標案id，查詢有參與的公司統編</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-100" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>VATInfo</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>請利用VATInfo來完成以下目標：
+
+<ul>
+<li>請列出&quot;70794974&quot;的董監事</li>
+<li>請列出&quot;70794974&quot;有參與的政府標案</li>
+<li>請查出參與這些標案的公司統編</li>
+<li>請再查詢這些公司的董監事</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-101" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Q&amp;A</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='學習目標'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='今日環境介紹'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='命令列'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='啟動Rstudio Server'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='2014年IT界最受矚目的專案：docker'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='Docker 生態系'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='R and Docker'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='Container And Image'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='Docker 指令詳解：<code>docker</code>總覽'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='Docker 指令詳解：<code>docker run</code>總覽'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='登入Rstudio'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='Rstudio 界面解說'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='說明<code>建立新專案</code>(0.98.1091)'>
+         13
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=14 title='動動手'>
+         14
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=15 title='目標簡介'>
+         15
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=16 title='<a href="https://hub.docker.com">Docker Hub</a>'>
+         16
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=17 title='範例下載script'>
+         17
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=18 title='R是一個以函數為主體的語言'>
+         18
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=19 title='讀取資料'>
+         19
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=20 title='一個可能的實際情況...'>
+         20
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=21 title='把1 ~ 4包成一個函數'>
+         21
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=22 title='當其他人需要分析結果...'>
+         22
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=23 title='利用git 來傳送<code>pkg_count.R</code>'>
+         23
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=24 title='將<code>pkg_count</code>新增至CRANLog專案'>
+         24
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=25 title='將CRANLog專案上傳到github'>
+         25
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=26 title='了解ssh key'>
+         26
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=27 title='建立ssh key:<code>ssh-keygen</code>'>
+         27
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=28 title='上傳public key'>
+         28
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=29 title='建立github專案'>
+         29
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=30 title='設定遠端專案，上傳'>
+         30
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=31 title='下載<code>pkg_count.R</code>'>
+         31
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=32 title='運用<code>git</code>和<code>github</code>的好處'>
+         32
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=33 title='建立<code>pkg_count</code>的說明文件'>
+         33
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=34 title='套件化'>
+         34
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=35 title='建立套件專案CRANLog'>
+         35
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=36 title='將套件放置至私有套件庫'>
+         36
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=37 title='利用Docker更新套件資訊'>
+         37
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=38 title='Rscript'>
+         38
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=39 title='將Rscript和docker run結合'>
+         39
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=40 title='直接從套件庫安裝'>
+         40
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=41 title='統一編號查詢(mongodb)'>
+         41
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=42 title='啟動mongodb'>
+         42
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=43 title='安裝套件<code>rmongodb</code>'>
+         43
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=44 title='查詢mongodb的必備知識'>
+         44
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=45 title='<code>mongo.create</code>'>
+         45
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=46 title='<code>mongo.find</code>和cursor'>
+         46
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=47 title='R 中有沒有辦法使用類似迭代器的概念?'>
+         47
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=48 title='rmongodb的cursor'>
+         48
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=49 title='將統編轉換為公司名稱'>
+         49
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=50 title='建立套件VATInfo'>
+         50
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=51 title='將統編轉換為公司董監事名單'>
+         51
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=52 title='擴充VATInfo的功能'>
+         52
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=53 title='R 套件和git'>
+         53
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=54 title='DESCRIPTION'>
+         54
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=55 title='經驗分享：如何回報bug'>
+         55
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=56 title='一般Open Source軟體對於錯誤回報的處理'>
+         56
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=57 title='SQL Database'>
+         57
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=58 title='政府標案資料'>
+         58
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=59 title='啟動PostgreSQL'>
+         59
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=60 title='安裝RPostgreSQL(需要安裝其他相依模組)'>
+         60
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=61 title='利用Docker exec進入container'>
+         61
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=62 title='連結資料庫'>
+         62
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=63 title='<code>dbReadTable</code>'>
+         63
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=64 title='SQL Command'>
+         64
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=65 title='常見問題：中文編碼'>
+         65
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=66 title='編碼知多少'>
+         66
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=67 title='編碼知多少'>
+         67
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=68 title='R 如何處理文字<code>character</code>？'>
+         68
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=69 title='萬國碼'>
+         69
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=70 title='R 的編碼錯誤訊息'>
+         70
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=71 title='SQL資料庫中解決編碼問題'>
+         71
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=72 title='試著讀取BIG5 看看亂碼'>
+         72
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=73 title='dplyr 整理資料的好幫手'>
+         73
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=74 title='dplyr 的常用函數'>
+         74
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=75 title='dplyr的函數可作用於'>
+         75
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=76 title='查詢廠商參與的標案'>
+         76
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=77 title='%&gt;%, <a href="http://cran.r-project.org/web/packages/magrittr/index.html">magrittr</a>'>
+         77
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=78 title='dplyr 和SQL Database'>
+         78
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=79 title='dplyr 和SQL Database'>
+         79
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=80 title='動動手'>
+         80
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=81 title='型態問題'>
+         81
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=82 title='R 的資料型態'>
+         82
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=83 title='R 資料的Atomic Type'>
+         83
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=84 title='R 中組合成高階物件的方式'>
+         84
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=85 title='list, data.frame'>
+         85
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=86 title='attributes'>
+         86
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=87 title='An example of list + attributes: S3'>
+         87
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=88 title='S4'>
+         88
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=89 title='輸出的型態'>
+         89
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=90 title='輸出的型態範例：矩陣'>
+         90
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=91 title='list 和 environment'>
+         91
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=92 title='常見的問題'>
+         92
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=93 title='List'>
+         93
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=94 title='<code>[</code>和<code>[[</code>'>
+         94
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=95 title='Environment'>
+         95
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=96 title='Environment管理變數和物件之間的關係'>
+         96
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=97 title='<code>globalenv()</code>'>
+         97
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=98 title='練習專案'>
+         98
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=99 title='VATInfo'>
+         99
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=100 title='VATInfo'>
+         100
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=101 title='Q&amp;A'>
+         101
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>

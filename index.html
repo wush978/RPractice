@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>R 軟體套件開發實務應用</title>
+  <meta charset="utf-8">
+  <meta name="description" content="R 軟體套件開發實務應用">
+  <meta name="author" content="Wush Wu">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012-wush/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012-wush/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012-wush/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/zenburn.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/custom.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="libraries/frameworks/io2012-wush/js/jquery-1.7.min.js"></script>
+  <!-- <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> -->
+  <script data-main="libraries/frameworks/io2012-wush/js/slides" 
+    src="libraries/frameworks/io2012-wush/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>R 軟體套件開發實務應用</h1>
+    <h2></h2>
+    <p>Wush Wu<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>關於講者</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <ul>
+<li>台灣大學電機工程學研究所博士生</li>
+<li>Taiwan R User Group 共同創辦人</li>
+<li>R 套件相關著作
+
+<ul>
+<li><a href="http://cran.r-project.org/web/packages/FeatureHashing/index.html">FeatureHashing</a>和<a href="http://cran.r-project.org/web/packages/RMessenger/">RMessenger</a>的作者</li>
+<li><a href="http://cran.r-project.org/web/packages/knitr/">knitr</a> 的推廣者和小貢獻者</li>
+<li><a href="http://cran.r-project.org/web/packages/RcppCNPy/">RcppCNPy</a>的第二作者</li>
+<li><a href="http://cran.r-project.org/web/packages/digest/">digest</a>的貢獻者</li>
+</ul></li>
+</ul>
+
+</div>
+<div style='float:right;width:48%;' class='centered'>
+  <p><img src="assets/img/wush.jpg" style="max-width:100%;max-height:100%;" /></p>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="segue dark" id="slide-2" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>為什麼R 這麼受歡迎？</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="" id="slide-3" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 來自世界上最專業的統計學家</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<p><center><img src="assets/img/statician_10521919-655x280.jpg" class="fit100" /></center></p>
+
+<p>圖片來源： <a href="http://myfootpath.com/careers/engineering-careers/statistician-careers/">http://myfootpath.com/careers/engineering-careers/statistician-careers/</a></p>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="" id="slide-4" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>R 可以輸出高品質的視覺化</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/img/flights_sml.jpg" style="max-width:100%;max-height:100%;" /></p>
+
+<p>取自<a href="http://www.r-bloggers.com/mapping-the-worlds-biggest-airlines/">http://www.r-bloggers.com/mapping-the-worlds-biggest-airlines/</a></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="" id="slide-5" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 有驚人彈性和潛力</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<p><center><img src="assets/img/fig_10_cran1.png" style="max-width:75%;max-height:75%;" /></center></p>
+
+<p>取自 <a href="http://r4stats.com/2013/03/19/r-2012-growth-exceeds-sas-all-time-total/">http://r4stats.com/2013/03/19/r-2012-growth-exceeds-sas-all-time-total/</a></p>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="" id="slide-6" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 很容易和其他工具整合</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<p><center>
+<img src="assets/fig/r-integration.png" alt="plot of chunk r-integration"> 
+</center></p>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="" id="slide-7" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 很容易擴充和客製化</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<p><center><img src="assets/img/t134_3ca_lg.jpg" style="max-width:100%;max-height:100%;" /></center>
+來源：<a href="http://img.diynetwork.com/DIY/2003/09/18/t134_3ca_med.jpg">http://img.diynetwork.com/DIY/2003/09/18/t134_3ca_med.jpg</a></p>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="segue dark" id="slide-8" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <hgroup>
+    <h2>R 是 Open Source</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-9" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>Open Source?</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>驚人的潛力和彈性</li>
+<li>容易擴充和客製化</li>
+<li>只要你願意且有能力，就可以貢獻並且改進</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-10" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 特別擅長用於</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>資料處理</li>
+<li>資料分析</li>
+<li>報表製作</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-11" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>R 軟體套件開發實務應用</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>套件是散布R 的程式碼的最完整方式
+
+<ul>
+<li>完整的相依性設定</li>
+<li>配備有範例資料與範例文件</li>
+<li>輕鬆的開發流程</li>
+</ul></li>
+<li>不只是為了別人寫套件，而是為了自己寫套件
+
+<ul>
+<li>將例行性的工作包裝成函數</li>
+<li>利用<code>roxygen2</code>相容的方式撰寫註解</li>
+<li>將類似目的的函數們包裝成套件</li>
+<li>利用github建立雲端套件庫，或自行架設私有套件庫</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-12" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>本期課程目標（表定）</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>R語言軟體套件開發環境、語言介紹</li>
+<li>撰寫R語言軟體套件</li>
+<li>自動測試與佈署R語言軟體套件</li>
+<li>R語言擴充應用</li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-13" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  <h2>我的目標</h2>
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li>帶給大家真正有用的技術
+
+<ul>
+<li>以最方便和最簡單的方式建立開發環境（rstudio，<a href="https://www.docker.com/">docker</a>）</li>
+<li>最新和最少，也最重要的軟體工程相關工具介紹（<a href="http://git-scm.com/">git</a> 、<a href="https://github.com/">github</a>）</li>
+<li>最新的製作套件相關的技術（rstudio, roxygen2, RUnit, travis-ci）</li>
+<li>個人經驗（jenkins）</li>
+</ul></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="largecontent" id="slide-14" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;" >
+<hgroup>
+  
+</hgroup>
+<article class = 'flexbox vcenter'>
+<ul>
+<li><a href="environment.html">環境設定、語言介紹</a></li>
+<li><a href="development.html">套件開發</a></li>
+<li><a href="ci.html">自動測試與自動部署</a></li>
+<li><a href="extension.html">擴充應用</a></li>
+</ul>
+
+</article>
+<!-- Presenter Notes -->
+</slide>
+<slide class="" id="slide-15" style="background-image: url('libraries/frameworks/io2012-wush/images/background.png'); background-repeat:no-repeat; background-position:center; background-size: 100% 100%;">
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='關於講者'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='為什麼R 這麼受歡迎？'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='R 來自世界上最專業的統計學家'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='R 可以輸出高品質的視覺化'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='R 有驚人彈性和潛力'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='R 很容易和其他工具整合'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='R 很容易擴充和客製化'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='R 是 Open Source'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='Open Source?'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='R 特別擅長用於'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='R 軟體套件開發實務應用'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='本期課程目標（表定）'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='我的目標'>
+         13
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=14 title=''>
+         14
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=15 title=''>
+         15
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
