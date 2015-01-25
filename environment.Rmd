@@ -447,8 +447,12 @@ dc:fb:51:c6:63:59:13:f1:06:91:d7:1c:dc:36:2f:da vagrant@rtutorial
 
 - 打包套件
 - 在終端機將套件複製到`~/www/R/src/contrib`
-    - 切換到`~/www/R/src/contrib`
-    - `docker cp rstudio:/home/vagrant/CRANLog_1.1.tar.gz .`
+
+```
+cd ~/www/R/src/contrib
+docker cp rstudio:/home/vagrant/<pkg name>_1.0.tar.gz .
+```
+
 - 在該目錄下更新套件資訊（`PACKAGES`, `PACKAGES.gz`）（卡住）
 
 *** =pnotes
