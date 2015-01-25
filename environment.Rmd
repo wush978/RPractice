@@ -521,7 +521,7 @@ docker run -v `pwd`:/src -w /src -it --rm rstudio-build \
 - 可能需要重新啟動R
 
 ```r
-install.packages("<pkg name>", 
+utils::install.packages("<pkg name>", 
   repos = "http://<ip>/R",
   type = "source")
 ```
